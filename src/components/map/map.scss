@@ -1,0 +1,21 @@
+map {
+  // #map {
+  //   height: 100%;
+  //   width: 100%;
+  //   position: absolute;
+  // }
+  // html,body{margin: 0; padding: 0;}
+
+}
+
+// Locate control has some mapbox styling which fucks up the control with mapzen
+.leaflet-control-locate {
+  a {
+     padding: 0px;
+  }
+  &.requesting {
+    a {
+      padding: 0px;
+    }
+  }
+}

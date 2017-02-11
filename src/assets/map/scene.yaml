@@ -1,0 +1,201 @@
+import: https://mapzen.com/carto/walkabout-style-more-labels/walkabout-style-more-labels.yaml
+
+global:
+  sdk_mapzen_api_key: mapzen-xe5PErc
+
+styles:
+    dashed:
+        base: lines
+        dash: [1.25, 1.25]
+        dash_background_color: [0.808,0.860,0.851]
+    dashed_big:
+        base: lines
+        dash: [2.0, 1.0]
+        dash_background_color: [0.808,0.860,0.851]
+    dashed_steps:
+        base: lines
+        dash: [0.5, 0.5]
+        dash_background_color: [0.867, 0.867, 0.867]
+    tools-tilecoords:
+        shaders:
+            blocks:
+                global: |
+                    // Varying to be added to both vertex and fragment shaders
+                    varying vec2 v_pos;
+                    #ifdef TANGRAM_FRAGMENT_SHADER
+                    vec2 TileCoords() {
+                        return fract(v_pos);
+                    }
+                    #endif
+                position: |
+                    v_pos = modelPosition().xy;
+    tools-aastep:
+        shaders:
+            extensions: OES_standard_derivatives
+            blocks:
+                global: |
+                    float aastep(float threshold, float value) {
+                        #ifdef TANGRAM_FRAGMENT_SHADER
+                            #ifdef TANGRAM_EXTENSION_OES_standard_derivatives
+                                float afwidth = length(vec2(dFdx(value), dFdy(value))) * 0.70710678118654757;
+                                return smoothstep(threshold - afwidth, threshold + afwidth, value);
+                            #else
+                                return step(threshold, value);
+                            #endif
+                        #else
+                            return step(threshold, value);
+                        #endif
+                    }
+    tools-grid:
+        mix: tools-tilecoords
+        shaders:
+            blocks:
+                global: |
+                    #ifdef TANGRAM_FRAGMENT_SHADER
+                    bool grid(vec2 st, float res, float press) {
+                        vec2 grid = fract(st * res);
+                        return (grid.x < res * press) || (grid.y < res * press);
+                    }
+                    float TileGrid(float res) {
+                        vec2 st = TileCoords() * 100. * res;
+                        float pct = 0.0;
+                        float press = 0.4 + (1.0 - fract(u_map_position.z)) * 0.1;
+                        if (grid(st, 0.01, press)) { pct += 0.5; }
+                        if (grid(st, 0.1, press)) { pct += 0.15; }
+                        return pct;
+                    }
+                    float TileGrid() {
+                        return mix(TileGrid(1.), TileGrid(2.), fract(u_map_position.z));
+                    }
+                    #endif
+    grid:
+        base: polygons
+        mix: [tools-grid]
+        shaders:
+            blocks:
+                filter: |
+                    color.rgb = vec3(0.899, 0.95, 1.0);
+                    color.rgb = mix(color.rgb, vec3(0.654,0.856,0.896), TileGrid());
+    water_border:
+        base: lines
+        texcoords: true
+        mix: tools-aastep
+        shaders:
+            blocks:
+                global: |
+                    float pulse(float x, float p, float w) {
+                        x = abs(x - p);
+                        if (x > w) { return 0.0; }
+                        x /= w;
+                        return (1.0 - x * x * (3.0 - 2.0 * x));
+                    }
+                width: |
+                    // Comment/Uncomment to fix the line to the border
+                    width *= 1.0 - v_texcoord.x;
+                color: |
+                    vec2 st = v_texcoord.xy;
+                    float pattern = aastep(.5, pulse(st.x, .75, .15) + pulse(st.x, .4, .10) + pulse(st.x, .1, .1));
+                    color.rgb = mix(color.rgb, vec3(0.675,0.855,0.886), pattern);
+    shapes-circle:
+        shaders:
+            blocks:
+                global: |
+                    // get distance field of a Circle
+                    // ================================
+                    float circleDF (vec2 st) {
+                        return dot(st,st);
+                    }
+    tiling-brick:
+        shaders:
+            blocks:
+                global: |
+                    // Repeats a coordinate space (st) in diferent brick-like tiles
+                    // ================================
+                    vec2 brick(vec2 st, float zoom){
+                        st *= zoom;
+                        // Here is where the offset is happening
+                        st.x += step(1., mod(st.y, 2.0)) * 0.5;
+                        return fract(st);
+                    }
+    pattern-dots:
+        mix: [tools-tilecoords, tiling-brick, shapes-circle, tools-aastep]
+        shaders:
+            blocks:
+                global: |
+                    #ifdef TANGRAM_FRAGMENT_SHADER
+                        float TileDots(float scale, float size) {
+                            vec2 tc = TileCoords() * scale * pow(2., floor(u_map_position.z) - abs(u_tile_origin.z));
+                            vec2 IN = brick(tc, 2.);
+                            float A = circleDF(vec2(0.5) - IN) * 1.8;
+                            float d = 0.0;
+                            if (u_map_position.z < 18.) {
+                                vec2 OUT = fract(tc * 2.);
+                                float B = circleDF(vec2(0.25) - OUT) * 7.;
+                                B = min(B, circleDF(vec2(0.75, 0.25) - OUT) * 7.);
+                                B = min(B, circleDF(vec2(0.50, 0.75) - OUT) * 7.);
+                                B = min(B, circleDF(vec2(0.00, 0.75) - OUT) * 7.);
+                                B = min(B, circleDF(vec2(1.00, 0.75) - OUT) * 7.);
+                                d = mix(A, B, pow(fract(u_map_position.z), 10.));
+                            } else {
+                                d = A;
+                            }
+                            return aastep(size, d);
+                        }
+                    #endif
+    dots:
+        base: polygons
+        mix: pattern-dots
+        shaders:
+            blocks:
+                color: |
+                    color.rgb = mix(color.rgb, vec3(0.850), TileDots(45., 0.1));
+                    // size was set to 35 previously, now 45
+    dots-rev:
+        base: polygons
+        mix: pattern-dots
+        shaders:
+            blocks:
+                color: |
+                    color.rgb = mix(vec3(0.850), color.rgb, TileDots(45., .21));
+
+layers:
+  natural-overlay:
+    arete:
+      filter: { kind: cliff }
+      draw:
+         dashed:
+           color: '#ecebe9'
+           order: 1002
+           width: 2.0px
+  landuse:
+    tier2:
+      conservation:
+        draw:
+          terrain:
+            color: [0.825,0.976,0.895]
+      natural_wood:
+        filter:
+          kind: [natural_wood, wood, forest]
+        draw:
+          terrain:
+            color: [0.88,0.99,0.88] #[0.956,0.99,0.966]
+      meadow:
+        filter:
+          kind: [meadow, grass]
+        draw:
+          terrain:
+            color: [1.000,0.973,0.930] #[0.808,0.962,0.951]
+
+    tier6:
+      wetland:
+        filter: { kind: wetland }
+        draw:
+          dots-rev:
+            color: [0.432,0.890,0.960]
+            order: function() { return feature.sort_rank; }
+      scrub:
+        filter:
+          kind: [scrub]
+        draw:
+          terrain:
+            color: [0.956,0.99,0.966] #[0.808,0.962,0.951]
