@@ -37,7 +37,7 @@ declare namespace L {
       new (options?: GeocoderOptions): Geocoder;
     }
 
-    export interface Geocoder extends L.Control {
+    export interface Geocoder extends L.Evented, L.Control {
     }
 
     export interface GeocoderOptions {

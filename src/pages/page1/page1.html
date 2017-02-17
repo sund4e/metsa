@@ -6,7 +6,14 @@
     <ion-title>Page One</ion-title>
   </ion-navbar>
 </ion-header>
+
 <ion-content>
-  <map-component></map-component>
+  <map-component (selectedLocation)="showAddLocationBar($event)"></map-component>
   <!-- <ion-img src='assets/img/img.jpg'></ion-img> -->
 </ion-content>
+
+<ion-footer *ngIf="showFooter" [@fadeInOut]>
+  <ion-toolbar>
+    <button ion-button block (click)="openAddLocationModal()">Lisää apaja!</button>
+  </ion-toolbar>
+</ion-footer>

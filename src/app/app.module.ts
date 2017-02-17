@@ -3,7 +3,11 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { Page1 } from '../pages/page1/page1';
 import { Page2 } from '../pages/page2/page2';
+import {AddLocationPage} from '../pages/add-location/add-location';
 import {MapComponent} from '../components/map/map';
+// import { AUTOCOMPLETE_DIRECTIVES, AUTOCOMPLETE_PIPES } from 'ionic2-auto-complete';
+import {SpeciesService} from '../providers/species-service';
+
 
 import { AngularFireModule } from 'angularfire2';
 export const firebaseConfig = {
@@ -19,7 +23,10 @@ export const firebaseConfig = {
     MyApp,
     Page1,
     Page2,
-    MapComponent
+    MapComponent,
+    AddLocationPage,
+    // AUTOCOMPLETE_DIRECTIVES,
+    // AUTOCOMPLETE_PIPES
   ],
   imports: [
     IonicModule.forRoot(MyApp),
@@ -29,8 +36,12 @@ export const firebaseConfig = {
   entryComponents: [
     MyApp,
     Page1,
-    Page2
+    Page2,
+    AddLocationPage
   ],
-  providers: [{provide: ErrorHandler, useClass: IonicErrorHandler}]
+  providers: [
+    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    SpeciesService
+  ]
 })
 export class AppModule {}
