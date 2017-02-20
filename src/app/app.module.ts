@@ -1,12 +1,20 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
-import { Page1 } from '../pages/page1/page1';
-import { Page2 } from '../pages/page2/page2';
+import { MapPage } from '../pages/map-page/map-page';
+// import { Page2 } from '../pages/page2/page2';
 import {AddLocationPage} from '../pages/add-location/add-location';
+import {ListPage} from '../pages/list/list';
+// import { TabsPage } from '../pages/tabs/tabs';
+import {SettingsPage} from '../pages/settings/settings';
 import {MapComponent} from '../components/map/map';
 // import { AUTOCOMPLETE_DIRECTIVES, AUTOCOMPLETE_PIPES } from 'ionic2-auto-complete';
 import {SpeciesService} from '../providers/species-service';
+import {ItemsService} from '../providers/items-service';
+import {ToastService} from '../providers/toast-service';
+
+import {MomentModule} from 'angular2-moment';
+
 
 
 import { AngularFireModule } from 'angularfire2';
@@ -21,27 +29,36 @@ export const firebaseConfig = {
 @NgModule({
   declarations: [
     MyApp,
-    Page1,
-    Page2,
+    MapPage,
+    // Page2,
     MapComponent,
     AddLocationPage,
+    ListPage,
+    SettingsPage
+    // TabsPage
     // AUTOCOMPLETE_DIRECTIVES,
     // AUTOCOMPLETE_PIPES
   ],
   imports: [
     IonicModule.forRoot(MyApp),
-    AngularFireModule.initializeApp(firebaseConfig)
+    AngularFireModule.initializeApp(firebaseConfig),
+    MomentModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    Page1,
-    Page2,
-    AddLocationPage
+    MapPage,
+    // Page2,
+    AddLocationPage,
+    ListPage,
+    SettingsPage,
+    // TabsPage,
   ],
   providers: [
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    SpeciesService
+    SpeciesService,
+    ItemsService,
+    ToastService
   ]
 })
 export class AppModule {}

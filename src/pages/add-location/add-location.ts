@@ -1,17 +1,13 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams, ViewController, TextInput } from 'ionic-angular';
+import { NavController, NavParams, ViewController } from 'ionic-angular';
 import {Validators, FormBuilder, FormGroup, FormControl } from '@angular/forms';
-// import {AUTOCOMPLETE_DIRECTIVES} from 'ionic2-auto-complete';
 import {SpeciesService} from '../../providers/species-service';
-import { SpeciesValidator } from  '../../validators/species-validator';
-import _ from 'lodash';
+import {ItemsService} from '../../providers/items-service';
 
-/*
-  Generated class for the AddLocation page.
+import * as _ from 'lodash';
+import * as moment from 'moment';
 
-  See http://ionicframework.com/docs/v2/components/#navigation for more info on
-  Ionic pages and navigation.
-*/
+
 @Component({
   selector: 'page-add-location',
   templateUrl: 'add-location.html',
@@ -26,7 +22,8 @@ export class AddLocationPage {
     public navParams: NavParams,
     private viewCtrl: ViewController,
     private formBuilder: FormBuilder,
-    private speciesService: SpeciesService
+    private speciesService: SpeciesService,
+    private itemsService: ItemsService
   ) {
       this.form = this.formBuilder.group({
         species: ['', this.validateSpecies.bind(this)],
@@ -48,12 +45,19 @@ export class AddLocationPage {
     this.form.patchValue({species: selection});
   }
 
-  dismiss(data) {
-    this.viewCtrl.dismiss(data);
+  dismiss() {
+    this.viewCtrl.dismiss();
   }
 
   logForm(){
-    console.log(this.form.value)
+    let item = this.form.value;
+    item.latLng = this.navParams.get('latLng');
+    item.time = moment();
+    this.itemsService.addItem(this.form.value)
+    .then(response => {
+      this.dismiss()
+    })
+    .catch(err => console.log(err, 'You do not have access!'));
   }
 
   validateSpecies(control: FormControl): any {

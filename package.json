@@ -22,6 +22,7 @@
     "@ionic/storage": "1.1.7",
     "@types/leaflet": "^1.0.50",
     "@types/lodash": "^4.14.44",
+    "angular2-moment": "^1.2.0",
     "angularfire2": "^2.0.0-beta.7",
     "firebase": "^3.6.9",
     "font-awesome": "^4.7.0",
@@ -35,6 +36,7 @@
     "leaflet.locatecontrol": "^0.60.0",
     "lodash": "^4.17.2",
     "mapzen.js": "^0.6.1",
+    "moment": "^2.17.1",
     "rxjs": "^5.0.0-beta.12",
     "sw-toolbox": "3.4.0",
     "zone.js": "0.6.26"

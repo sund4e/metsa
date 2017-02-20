@@ -65,7 +65,8 @@ export class MapComponent {
     L.control.locate({
       position: 'topleft',
       keepCurrentZoomLevel: true,
-      icon: 'fa fa-compass'
+      icon: 'fa fa-location-arrow'
+      // icon: 'fa fa-compass'
     }).addTo(this.map);
 
     // L.easyButton({
@@ -82,6 +83,20 @@ export class MapComponent {
     //     icon: '<button ion-button>Nappula</button>'
     //   }]
     // }).addTo(this.map);
+
+    L.easyButton({
+      id: 'id-for-the-button',  // an id for the generated button
+      position: 'topleft',      // inherited from L.Control -- the corner it goes in
+      type: 'animate',          // set to animate when you're comfy with css
+      leafletClasses: true,     // use leaflet classes to style the button?
+      states:[{                 // specify different icons and responses for your button
+        stateName: 'get-center',
+        onClick: function(button, map){
+          console.log('YAY!');
+        },
+        icon: 'fa-shopping-basket'
+      }]
+    }).addTo(this.map);
 
   }
 
