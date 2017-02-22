@@ -1,12 +1,14 @@
 import { Component, ViewChild } from '@angular/core';
 import { Nav, Platform } from 'ionic-angular';
 import { StatusBar, Splashscreen } from 'ionic-native';
+import { AngularFire } from 'angularfire2';
 // import { TabsPage } from '../pages/tabs/tabs';
 
 import { MapPage } from '../pages/map-page/map-page';
 // import { Page2 } from '../pages/page2/page2';
-import { ListPage } from '../pages/list/list';
-import { SettingsPage} from '../pages/settings/settings';
+// import { ListPage } from '../pages/list/list';
+// import { SettingsPage} from '../pages/settings/settings';
+import { LoginPage } from '../pages/login/login';
 
 
 @Component({
@@ -16,19 +18,31 @@ export class MyApp {
   @ViewChild(Nav) nav: Nav;
 
   // rootPage: any = TabsPage;
-  rootPage: any = MapPage;
+  rootPage: any;
 
-  pages: Array<{title: string, component: any}>;
+  // pages: Array<{title: string, component: any}>;
 
-  constructor(public platform: Platform) {
+  constructor(public platform: Platform, public af: AngularFire) {
+    //Send unautheticated users to Login
+    const authObserver = af.auth.subscribe( user => {
+      console.log(user);
+      if (user) {
+        this.rootPage = MapPage;
+        authObserver.unsubscribe();
+      } else {
+        this.rootPage = LoginPage;
+        authObserver.unsubscribe();
+      }
+    });
+
     this.initializeApp();
 
     //used for an example of ngFor and navigation
-    this.pages = [
-      { title: 'Page One', component: MapPage },
-      { title: 'Lista', component: ListPage }
-      // { title: 'Page Two', component: Page2 }
-    ];
+    // this.pages = [
+    //   { title: 'Map', component: MapPage },
+    //   { title: 'Lista', component: ListPage }
+    //   // { title: 'Page Two', component: Page2 }
+    // ];
 
   }
 

@@ -1,5 +1,10 @@
 {
   "dependencies": {
     "lodash": "registry:npm/lodash#4.0.0+20161015015725"
+  },
+  "globalDependencies": {
+    "geojson": "registry:dt/geojson#1.0.0+20170130182553",
+    "leaflet": "registry:dt/leaflet#1.0.0+20170217142443",
+    "leaflet-markercluster": "registry:dt/leaflet-markercluster#1.0.0+20170118061005"
   }
 }

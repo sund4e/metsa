@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar>
+
+    <ion-title>Kartta</ion-title>
+
+    <ion-buttons right>
+      <button ion-button icon-only (click)="openListModal()">
+        <ion-icon name="ios-menu"></ion-icon>
+      </button>
+    </ion-buttons>
+
+    <ion-buttons right>
+      <button ion-button icon-only (click)="openSettingsModal()">
+        <ion-icon name="ios-settings"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <map-component [items]="itemList"
+    (selectedLocation)="showAddLocationBar($event)"
+    (selectedMarker)="showItemBar($event)">
+  </map-component>
+  <!-- <ion-img src='assets/img/img.jpg'></ion-img> -->
+</ion-content>
+
+<ion-footer *ngIf="showFooter" [@fadeInOut]>
+  <ion-toolbar>
+    <button ion-button block (click)="openAddLocationModal()">Lisää apaja!</button>
+  </ion-toolbar>
+</ion-footer>

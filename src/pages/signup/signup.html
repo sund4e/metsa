@@ -1,0 +1,49 @@
+<!--
+  Generated template for the Signup page.
+
+  See http://ionicframework.com/docs/v2/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Luo tili</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <form [formGroup]="signupForm" (submit)="createUser()" novalidate>
+
+    <ion-item>
+      <ion-label stacked>Sähköpostiosoite</ion-label>
+      <ion-input #email formControlName="email" type="email"
+        placeholder="Sähköpostiosoite"
+        [class.invalid]="!signupForm.controls.email.valid &&
+          (signupForm.controls.email.dirty || submitAttempt)"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!signupForm.controls.email.valid  &&
+      (signupForm.controls.email.touched || submitAttempt)">
+      <p>Sähköpostiosoite on virheellinen</p>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Salasana</ion-label>
+      <ion-input #password formControlName="password" type="password"
+        placeholder="Salasana"
+        [class.invalid]="!signupForm.controls.password.valid &&
+          (signupForm.controls.password.dirty || submitAttempt)"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!signupForm.controls.password.valid  &&
+      (signupForm.controls.password.touched || submitAttempt)">
+      <p>Salasanan kuuluu olla vähintään 6 merkkiä</p>
+    </ion-item>
+
+    <button ion-button block type="submit" [disabled]="!signupForm.valid">
+      Luo tili
+    </button>
+
+  </form>
+
+</ion-content>

@@ -1,0 +1,27 @@
+
+<ion-header>
+  <ion-navbar>
+    <ion-title>Apajat</ion-title>
+
+    <ion-buttons start>
+      <button ion-button (click)="dismiss()">
+        <ion-icon name="md-close"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content padding>
+  <div *ngIf="searching" class="spinner-container">
+    <ion-spinner name="bubbles"></ion-spinner>
+  </div>
+
+  <ion-list>
+    <ion-item *ngFor="let item of itemList | async">
+      <h2>{{item.species}}</h2>
+      {{item.distance | number : '1.2-2'}} km
+    </ion-item>
+  </ion-list>
+
+</ion-content>

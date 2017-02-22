@@ -1,0 +1,66 @@
+<!--
+  Generated template for the Login page.
+
+  See http://ionicframework.com/docs/v2/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar color="primary">
+    <ion-title>Tervetuloa Apajille</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <p>
+    Kirjautumalla sisään varmistat että apajasi pysyvät tallessa laitteesta
+    riippumatta :)
+  </p>
+  <form [formGroup]="loginForm" (submit)="loginUser()" novalidate>
+
+    <ion-item>
+      <ion-label stacked>Sähköpostiosoite</ion-label>
+      <ion-input #email formControlName="email" type="email"
+        placeholder="Sähköpostiosoite"
+        [class.invalid]="!loginForm.controls.email.valid &&
+          (loginForm.controls.email.touched || submitAttempt)"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!loginForm.controls.email.valid  &&
+      (loginForm.controls.email.touched || submitAttempt)">
+      <p>Sähköpostiosoite on virheellinen</p>
+    </ion-item>
+
+    <ion-item>
+      <ion-label stacked>Salasana</ion-label>
+      <ion-input #password formControlName="password" type="password"
+        placeholder="Salasana"
+        [class.invalid]="!loginForm.controls.password.valid &&
+          (loginForm.controls.password.touched || submitAttempt)"></ion-input>
+    </ion-item>
+    <ion-item class="error-message" *ngIf="!loginForm.controls.password.valid  &&
+      (loginForm.controls.password.touched || submitAttempt)">
+      <p>Salasanan kuuluu olla vähintään 6 merkkiä</p>
+    </ion-item>
+
+    <button ion-button block class="formbutton" type="submit" [disabled]="!loginForm.valid">
+      Kirjaudu sisään
+    </button>
+
+  </form>
+
+
+  <!-- <button ion-button block clear (click)="goToResetPassword()">
+    I forgot my password 🙁
+  </button> -->
+
+  <button ion-button block clear (click)="createAccount()">
+    Luo uusi tili
+  </button>
+
+  <button ion-button block color="light" class="margin-button" (click)="loginAnonymous()">
+    En halua luoda tiliä
+  </button>
+
+</ion-content>

@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/8babe922646c59fc0e1eed4cd870282b8ba89caf/leaflet-markercluster/index.d.ts",
+    "raw": "registry:dt/leaflet-markercluster#1.0.0+20170118061005",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/8babe922646c59fc0e1eed4cd870282b8ba89caf/leaflet-markercluster/index.d.ts"
+  }
+}

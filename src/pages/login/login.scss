@@ -1,0 +1,27 @@
+page-login {
+  .margin-button {
+    margin-top: 30px;
+  }
+
+  p {
+    font-size: 1em;
+    color: color($colors, primary)
+  }
+
+  ion-label {
+    margin-left: 5px;
+  }
+
+  ion-input {
+    padding: 5px;
+  }
+
+  .invalid {
+    border-bottom: 1px solid #FF6153;
+  }
+
+  .error-message .item-inner {
+    border-bottom: 0 !important;
+  }
+
+}

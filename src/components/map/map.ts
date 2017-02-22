@@ -1,10 +1,12 @@
-import {Component, Output, EventEmitter} from '@angular/core';
+import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {Http} from '@angular/http';
 import {LoadingController} from 'ionic-angular';
+import { FirebaseListObservable} from 'angularfire2';
 import L from 'leaflet';
 import 'leaflet.locatecontrol';
 import 'leaflet-geocoder-mapzen';
-import 'leaflet-easybutton'
+import 'leaflet-easybutton';
+import 'leaflet.markercluster';
 
 // declare var L: any;
 declare var Tangram: any;
@@ -18,7 +20,9 @@ declare var Tangram: any;
 
 export class MapComponent {
   // @ViewChild('map') map;
+  @Input() items: FirebaseListObservable<any>;
   @Output() selectedLocation = new EventEmitter();
+  @Output() selectedMarker = new EventEmitter();
   map: any;
   loading: any;
   marker: any;
@@ -27,7 +31,6 @@ export class MapComponent {
 
   ngAfterViewInit() {
     this.loading = this.showLoading();
-    console.log('init');
     //load map doesn't fire without timeout TODO: any other workaroud?
     setTimeout(this.loadMap.bind(this), 100);
   }
@@ -35,7 +38,10 @@ export class MapComponent {
   loadMap() {
     console.log('loadMap:');
     this.map = L
-      .map('map', {zoomControl: false})
+      .map('map', {
+        zoomControl: false,
+        maxZoom: 20
+      })
       .locate({setView: true, maxZoom: 16})
       .whenReady(this.dismissLoading.bind(this))
       .on('contextmenu', this.selectLocation.bind(this))
@@ -98,6 +104,29 @@ export class MapComponent {
       }]
     }).addTo(this.map);
 
+    this.addMarkers();
+
+  }
+
+  /*
+  Saves item key to marker.title as typescript won't allow custom fields on the
+  marker. TODO: find a way to get rid of this legacy :F*/
+  addMarkers () {
+    var markers = L.markerClusterGroup();
+    this.items.subscribe(list => {
+      list.forEach(item => {
+        console.log(item);
+        let marker = L.marker(item.latLng, {title: item.$key})
+          .on('click', this.selectMarker.bind(this));
+        markers.addLayer(marker);
+      });
+    });
+    this.map.addLayer(markers);
+  }
+
+  selectMarker(e) {
+    console.log(e.target.options.title);
+    this.selectedMarker.emit(e.target.options.title);
   }
 
   showLoading () {

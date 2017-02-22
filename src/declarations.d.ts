@@ -14,11 +14,15 @@
 declare module '*';
 declare module 'mapzen.js';
 
-//Typings for leaflet.locatecontrol & leaflet-easybutton by Suvi
-//Typings for leaflet-geocoder-mapzen from:
-//https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/leaflet-geocoder-mapzen/index.d.ts
-/// <reference path="../node_modules/@types/leaflet/index.d.ts" />
-//// <reference path="../leaflet/leaflet.d.ts" />
+/*
+Typings for leaflet.locatecontrol & leaflet-easybutton by Suvi
+
+Typings for leaflet-geocoder-mapzen edited from:
+https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/leaflet-geocoder-mapzen/index.d.ts
+(some errors in the original typings)
+*/
+//// <reference path="../node_modules/@types/leaflet/index.d.ts" />
+/// <reference path="../typings/globals/leaflet/leaflet.d.ts" />
 declare namespace L {
   export interface ControlStatic {
     Locate: Control.LocateStatic;
