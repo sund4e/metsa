@@ -12,4 +12,8 @@ map-page {
   toolbar-title {
     text-align: center
   }
+
+  .footer-md::before {
+    background-image: none;
+  }
 }

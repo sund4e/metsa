@@ -13,14 +13,47 @@
 
 
 <ion-content padding>
-  <div *ngIf="searching" class="spinner-container">
+  <!-- <div *ngIf="searching" class="spinner-container">
     <ion-spinner name="bubbles"></ion-spinner>
-  </div>
+    <p>Haetaan apajalistaa</p>
+  </div> -->
+
+  <ion-searchbar
+    (ionInput)="getSearchReults($event)"
+    mode="wp"
+    placeholder="Etsi laji">
+  </ion-searchbar>
+
+  <ion-buttons center>
+    <button ion-button small outline
+    [color]="ratingFilter == 1 ? 'primary' : 'grey'"
+    (click)="getRatingResults(1)">
+      <ion-icon name="ios-basket"></ion-icon>
+    </button>
+    <button ion-button small outline
+    [color]="ratingFilter == 2 ? 'primary' : 'grey'"
+    (click)="getRatingResults(2)">
+      <ion-icon name="ios-basket"></ion-icon>
+      <ion-icon name="ios-basket"></ion-icon>
+    </button>
+    <button ion-button small outline
+    [color]="ratingFilter == 3 ? 'primary' : 'grey'"
+    (click)="getRatingResults(3)">
+      <ion-icon name="ios-basket"></ion-icon>
+      <ion-icon name="ios-basket"></ion-icon>
+      <ion-icon name="ios-basket"></ion-icon>
+    </button>
+  </ion-buttons>
 
   <ion-list>
-    <ion-item *ngFor="let item of itemList | async">
+    <ion-item *ngFor="let item of itemList | async" (click)="dismiss(item)">
       <h2>{{item.species}}</h2>
-      {{item.distance | number : '1.2-2'}} km
+      <ion-note *ngIf="item.distance" item-right>
+        {{item.distance | number : '1.2-2'}} km
+      </ion-note>
+      <ion-icon *ngIf="item.rating >= 3" name="ios-basket"></ion-icon>
+      <ion-icon *ngIf="item.rating >= 2" name="ios-basket"></ion-icon>
+      <ion-icon *ngIf="item.rating >= 1" name="ios-basket"></ion-icon>
     </ion-item>
   </ion-list>
 

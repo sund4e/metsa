@@ -25,6 +25,7 @@ export class MyApp {
   constructor(public platform: Platform, public af: AngularFire) {
     //Send unautheticated users to Login
     const authObserver = af.auth.subscribe( user => {
+      this.rootPage = MapPage;
       console.log(user);
       if (user) {
         this.rootPage = MapPage;

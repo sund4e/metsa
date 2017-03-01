@@ -1,0 +1,8 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/1adaa22d7a6cc83ce09638e2cae00fc6f6589857/leaflet.awesome-markers/leaflet.awesome-markers.d.ts",
+    "raw": "registry:dt/leaflet.awesome-markers#2.0.0+20160919070725",
+    "typings": "https://raw.githubusercontent.com/DefinitelyTyped/DefinitelyTyped/1adaa22d7a6cc83ce09638e2cae00fc6f6589857/leaflet.awesome-markers/leaflet.awesome-markers.d.ts"
+  }
+}

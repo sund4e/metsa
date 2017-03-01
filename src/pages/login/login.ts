@@ -96,4 +96,9 @@ export class LoginPage {
     this.loading.present();
   }
 
+  log(e) {
+    console.log(this.loginForm.controls.email.value);
+    console.log(this.loginForm.controls.email.value == '');
+  }
+
 }

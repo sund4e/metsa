@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, NavParams } from 'ionic-angular';
+import { NavController, NavParams, ViewController} from 'ionic-angular';
 import { AuthService } from '../../providers/auth-service';
 import { LoginPage } from '../login/login';
 
@@ -15,11 +15,15 @@ import { LoginPage } from '../login/login';
 })
 export class SettingsPage {
 
-  constructor(public navCtrl: NavController, public auth: AuthService) {}
+  constructor(public navCtrl: NavController, public auth: AuthService, public viewCtrl: ViewController) {}
 
   logout() {
-    this.auth.logoutUser();
     this.navCtrl.setRoot(LoginPage);
+    this.auth.logoutUser();
+  }
+
+  dismiss() {
+    this.viewCtrl.dismiss();
   }
 
 }

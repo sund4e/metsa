@@ -15,7 +15,12 @@ Install leaflet plugins
 ´´´
 npm install leaflet.markercluster
 install dt~leaflet-markercluster --global --save
+
+npm install drmonty-leaflet-awesome-markers --save
+typings install dt~leaflet.awesome-markers --save --global
 ´´´
+leaflet typings break leaflet.awesome-markers typings -> in leaflet typings
+change line 1417 ´iconUrl: string;´  to ´iconUrl?: string;´
 
 ##Typings issue
 Make sure that ´tsconfig.json´has
@@ -40,7 +45,16 @@ npm install @types/lodash@4.14.44 --save
 Describe and show how to run the tests with code examples.
 
 ##Todo
+-! show notes in map
+-! when deleting item, it doesn't disappear from map :F
+-! make sure map control buttons work
+-! sing out and sign in -> retarded map
+-! orientation
+-! anonymous account
+-! removing item fires toast twice
+-! handle location errors in map-page.js
 - mapping firebase errors in Finnish
 - adding possibility to convert anonymous account to user account
 - images
 - analytics : http://blog.pdsullivan.com/posts/2015/02/19/ionicframework-googleanalytics-log-errors.html
+- geofire

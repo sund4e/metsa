@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, ViewController } from 'ionic-angular';
-import {Validators, FormBuilder, FormGroup, FormControl } from '@angular/forms';
-import {SpeciesService} from '../../providers/species-service';
-import {ItemsService} from '../../providers/items-service';
+import { Validators, FormBuilder, FormGroup, FormControl } from '@angular/forms';
+import { SpeciesService } from '../../providers/species-service';
+import { ItemsService } from '../../providers/items-service';
+import { Item } from '../../models/item';
+import { Observable, Subscription, Subject } from "rxjs/Rx";
 
 import * as _ from 'lodash';
 import * as moment from 'moment';
@@ -15,7 +17,7 @@ import * as moment from 'moment';
 export class AddLocationPage {
   form : FormGroup;
   suggestions : any;
-  showList: boolean = true;
+  item: Item;
 
   constructor(
     public navCtrl: NavController,
@@ -25,11 +27,21 @@ export class AddLocationPage {
     private speciesService: SpeciesService,
     private itemsService: ItemsService
   ) {
+    if(this.navParams.get('item')) {
+      this.item = this.navParams.get('item');
+      this.form = this.formBuilder.group({
+        species: [this.item.species, this.validateSpecies.bind(this)],
+        rating: [this.item.rating, Validators.required],
+        notes: [this.item.notes],
+      });
+    } else {
       this.form = this.formBuilder.group({
         species: ['', this.validateSpecies.bind(this)],
+        rating: ['', Validators.required],
         notes: [''],
       });
     }
+  }
 
   listOptions(value) {
     console.log(value);
@@ -37,6 +49,9 @@ export class AddLocationPage {
       this.suggestions = [];
     } else {
       this.suggestions = _.map(this.speciesService.getResults(value), 'name');
+      if(this.suggestions.length == 0) {
+        this.suggestions.push('Ei vastaavia lajeja');
+      }
     }
   }
 
@@ -50,18 +65,43 @@ export class AddLocationPage {
   }
 
   logForm(){
-    let item = this.form.value;
-    item.latLng = this.navParams.get('latLng');
-    item.time = moment();
-    this.itemsService.addItem(this.form.value)
+    if(this.item) {
+      this.editItem();
+    } else {
+      this.addItem();
+    }
+  }
+
+  addItem() {
+    let item = new Item(
+      this.navParams.get('latLng'),
+      this.form.value.species,
+      this.form.value.notes,
+      this.form.value.rating,
+      moment().unix()
+    );
+
+    this.itemsService.addItem(item)
     .then(response => {
-      this.dismiss()
-    })
-    .catch(err => console.log(err, 'You do not have access!'));
+      this.dismiss();
+    });
+  }
+
+  editItem() {
+    let updates = {
+      species: this.form.value.species,
+      rating: this.form.value.rating,
+      notes: this.form.value.notes,
+      timestamp: moment().unix()
+    }
+    this.itemsService.updateItem(this.item.$key, updates)
+    .then(response => {
+      this.dismiss();
+    });
+
   }
 
   validateSpecies(control: FormControl): any {
-    console.log('validation');
     let validSpeciesNames = this.speciesService.getSpeciesList();
     if (validSpeciesNames.indexOf(control.value) == -1){
       return {

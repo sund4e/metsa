@@ -7,13 +7,14 @@ import { MapPage } from '../pages/map-page/map-page';
 import {AddLocationPage} from '../pages/add-location/add-location';
 import {ListPage} from '../pages/list/list';
 import {SettingsPage} from '../pages/settings/settings';
-import {MapComponent} from '../components/map/map';
-import {SpeciesService} from '../providers/species-service';
+import { MapComponent} from '../components/map/map';
+import { SpeciesService } from '../providers/species-service';
 import {ItemsService} from '../providers/items-service';
 import {ToastService} from '../providers/toast-service';
 import { AuthService } from '../providers/auth-service';
 
 import {MomentModule} from 'angular2-moment';
+import { Ionic2RatingModule } from 'ionic2-rating';
 
 
 
@@ -45,7 +46,8 @@ const myFirebaseAuthConfig = {
   imports: [
     IonicModule.forRoot(MyApp),
     AngularFireModule.initializeApp(firebaseConfig, myFirebaseAuthConfig),
-    MomentModule
+    MomentModule,
+    Ionic2RatingModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [

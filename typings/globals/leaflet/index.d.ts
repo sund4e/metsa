@@ -1414,7 +1414,7 @@ declare namespace L {
     }
 
     export interface IconOptions extends BaseIconOptions {
-        iconUrl: string;
+        iconUrl?: string;
     }
 
     // This class does not exist in reality, it's just a way to provide

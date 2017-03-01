@@ -18,15 +18,59 @@
 </ion-header>
 
 <ion-content>
-  <map-component [items]="itemList"
-    (selectedLocation)="showAddLocationBar($event)"
-    (selectedMarker)="showItemBar($event)">
+  <map-component [items]="itemList" [selectedItemId]="itemId"
+    (locationSelection)="selectLocation($event)"
+    (markerSelection)="showItemBar($event)">
   </map-component>
   <!-- <ion-img src='assets/img/img.jpg'></ion-img> -->
 </ion-content>
 
-<ion-footer *ngIf="showFooter" [@fadeInOut]>
-  <ion-toolbar>
-    <button ion-button block (click)="openAddLocationModal()">Lisää apaja!</button>
+<ion-footer *ngIf="latLng || item" [@fadeInOut]>
+  <ion-toolbar *ngIf="latLng">
+    <button ion-button block (click)="openEditItemModal()">Lisää apaja!</button>
   </ion-toolbar>
+
+  <ion-card *ngIf="item">
+    <ion-item>
+      <!-- <ion-avatar item-left>
+        <img src="img/marty-avatar.png">
+      </ion-avatar> -->
+      <h2>{{(item | async)?.species}}</h2>
+      <p>{{((item | async)?.timestamp | amFromUnix) | amCalendar}}</p>
+    </ion-item>
+
+    <!-- <img src="img/advance-card-bttf.png"> -->
+
+    <!-- <ion-card-content>
+      <p>{{(item | async)?.notes}}</p>
+    </ion-card-content> -->
+
+    <ion-row>
+      <ion-col width-67>
+        <button ion-button icon-left clear small>
+          <ion-icon name="ios-basket-outline"></ion-icon>
+          <div>{{(item | async)?.rating}}</div>
+        </button>
+      </ion-col>
+      <ion-col widith-33>
+        <ion-buttons right>
+          <button ion-button icon-left clear small
+            (click)="openEditItemModal()">
+            <ion-icon name="ios-create-outline"></ion-icon>
+          </button>
+          <button ion-button icon-left clear small
+            (click)="deleteItemAlert()">
+            <ion-icon name="ios-trash-outline"></ion-icon>
+          </button>
+        </ion-buttons>
+      </ion-col>
+      <!-- <ion-col center text-center>
+
+        <ion-note>
+          11h ago
+        </ion-note>
+      </ion-col> -->
+    </ion-row>
+
+  </ion-card>
 </ion-footer>

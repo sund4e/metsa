@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
+import {Observable, Subject} from "rxjs/Rx";
 import 'rxjs/add/operator/map';
 import { AngularFire, FirebaseListObservable } from 'angularfire2';
 import { ToastService } from './toast-service';
 import { AuthService } from './auth-service';
+import { Item } from '../models/item';
+// import GeoFire from 'geofire'; Geofire should be ready to use
 import * as _ from 'lodash';
 
 
@@ -14,30 +17,33 @@ import * as _ from 'lodash';
 */
 @Injectable()
 export class ItemsService {
+  uid: number
   itemList: FirebaseListObservable<any>;
+
 
   constructor(
     public auth: AuthService,
     public af: AngularFire,
     public toast: ToastService
   ) {
-      let uid = this.auth.getUserID();
-      this.itemList = af.database.list('/users/' + uid);
-    // this.itemList
-    //   .subscribe(snapshots => {
-    //     snapshots.forEach(snapshot => {
-    //       // console.log(snapshot.key)
-    //       // console.log(snapshot)
-    //     });
-    //   })
+      this.uid = this.auth.getUserID();
+      this.itemList = af.database.list('/users/' + this.uid)
   }
 
-  getItems () {
+  getItems (): Observable<Item[]> {
     return this.itemList
+      .map(Item.fromJsonList);
+  }
+
+  getItem(id: string): Observable<Item> {
+    return this.af.database.object('/users/' + this.uid + '/' + id)
+      .map(Item.fromJson);
   }
 
   getSortedItems(currLat, currLng) {
-    return this.itemList.map(items => {
+    return this.itemList
+    .map(Item.fromJsonList)
+    .map(items => {
       return items
         .map(item => {
           item.distance = this.calculateDistance(
@@ -46,29 +52,49 @@ export class ItemsService {
           return item;
         })
         .sort(this.compareDistance)
-
     });
   };
 
-  getItem(id) {
-    let item = this.af.database.list('/items/' + id);
-    return item.subscribe(item => {
-      return _.mapValues(_.keyBy(item, '$key'), property => {
-        if(property.$value) {
-          return property.$value;
-        }
-        return property;
-      })
+  // getSortedItems(currLat, currLng) {
+  //   return this.itemList.map(items => {
+  //     return items
+  //       .map(item => {
+  //         item.distance = this.calculateDistance(
+  //           currLat, currLng, item.latLng.lat, item.latLng.lng
+  //         );
+  //         return item;
+  //       })
+  //       .sort(this.compareDistance)
+  //   });
+  // };
+
+  addItem (item: Item) {
+    return this.itemList.push(item)
+    .then(response => {
+      this.toast.showSuccess('Apaja tallennettu');
+    }, error => {
+      this.toast.showFail('Virhe apajan lisäämisessä: ' + error);
     });
   }
 
-  addItem (object) {
-    return this.itemList.push(object)
+  deleteItem(id:string) {
+    return this.itemList.remove(id)
     .then(response => {
       console.log(response);
-      this.toast.showSuccess('Apaja tallennettu');
+      this.toast.showSuccess('Apaja poistettu');
     }, error => {
-      console.log(error);
+      this.toast.showFail('Virhe apajan poistossa: ' + error);
+    });
+  }
+
+  updateItem(id: string, updates: any) {
+    console.log(id);
+    return this.itemList.update(id, updates)
+    .then(response => {
+      console.log(response);
+      this.toast.showSuccess('Muokkaus tallennettu');
+    }, error => {
+      this.toast.showFail('Virhe apajan muokkauksessa: ' + error);
     });
   }
 

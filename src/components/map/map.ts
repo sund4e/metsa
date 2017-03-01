@@ -1,12 +1,16 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {Http} from '@angular/http';
 import {LoadingController} from 'ionic-angular';
-import { FirebaseListObservable} from 'angularfire2';
+// import { FirebaseListObservable} from 'angularfire2';
+import { Observable, Subscription } from "rxjs/Rx";
+import { Item } from '../../models/item';
 import L from 'leaflet';
 import 'leaflet.locatecontrol';
 import 'leaflet-geocoder-mapzen';
 import 'leaflet-easybutton';
 import 'leaflet.markercluster';
+import 'drmonty-leaflet-awesome-markers';
+import * as _ from 'lodash';
 
 // declare var L: any;
 declare var Tangram: any;
@@ -20,12 +24,33 @@ declare var Tangram: any;
 
 export class MapComponent {
   // @ViewChild('map') map;
-  @Input() items: FirebaseListObservable<any>;
-  @Output() selectedLocation = new EventEmitter();
-  @Output() selectedMarker = new EventEmitter();
+  @Input() items: Item[];
+  @Input() selectedItemId: string;
+  @Output() locationSelection = new EventEmitter();
+  @Output() markerSelection = new EventEmitter();
   map: any;
   loading: any;
-  marker: any;
+  locationMarker: any; //Marker for the selected location
+  selectedMarker: any; //Marker for the item that has been selected
+  markerLayer: any; //Markers for the items list
+
+  basicMarkerStyle = L.AwesomeMarkers.icon({
+    icon: 'star',
+    markerColor: 'darkgreen',
+    prefix: 'fa'
+  });
+
+  selectedMarkerStyle = L.AwesomeMarkers.icon({
+    icon: 'star',
+    markerColor: 'green',
+    prefix: 'fa'
+  });
+
+  locationMarkerStyle = L.AwesomeMarkers.icon({
+    icon: 'circle',
+    markerColor: 'green',
+    prefix: 'fa'
+  });
 
   constructor (public loadingCtrl: LoadingController) {}
 
@@ -33,6 +58,12 @@ export class MapComponent {
     this.loading = this.showLoading();
     //load map doesn't fire without timeout TODO: any other workaroud?
     setTimeout(this.loadMap.bind(this), 100);
+  }
+
+  //Update markers every time @Input items changes
+  ngOnChanges(changes: any) {
+    console.log('ngChange fired');
+    this.updateMarkerLayer();
   }
 
   loadMap() {
@@ -45,7 +76,7 @@ export class MapComponent {
       .locate({setView: true, maxZoom: 16})
       .whenReady(this.dismissLoading.bind(this))
       .on('contextmenu', this.selectLocation.bind(this))
-      .on('click', this.clearLocationSelection.bind(this))
+      .on('click', this.clearSelection.bind(this))
       .on('locationerror', this.handleLocationError.bind(this));
 
     Tangram
@@ -75,21 +106,6 @@ export class MapComponent {
       // icon: 'fa fa-compass'
     }).addTo(this.map);
 
-    // L.easyButton({
-    //   id: 'id-for-the-button',  // an id for the generated button
-    //   position: 'bottomleft',      // inherited from L.Control -- the corner it goes in
-    //   type: 'animate',          // set to animate when you're comfy with css
-    //   leafletClasses: true,     // use leaflet classes to style the button?
-    //   states:[{                 // specify different icons and responses for your button
-    //     stateName: 'get-center',
-    //     onClick: function(button, map){
-    //       console.log('YAY!');
-    //     },
-    //     title: 'show me the middle',
-    //     icon: '<button ion-button>Nappula</button>'
-    //   }]
-    // }).addTo(this.map);
-
     L.easyButton({
       id: 'id-for-the-button',  // an id for the generated button
       position: 'topleft',      // inherited from L.Control -- the corner it goes in
@@ -104,29 +120,54 @@ export class MapComponent {
       }]
     }).addTo(this.map);
 
-    this.addMarkers();
+    // this.addMarkers();
 
   }
 
   /*
   Saves item key to marker.title as typescript won't allow custom fields on the
-  marker. TODO: find a way to get rid of this legacy :F*/
-  addMarkers () {
-    var markers = L.markerClusterGroup();
-    this.items.subscribe(list => {
-      list.forEach(item => {
-        console.log(item);
-        let marker = L.marker(item.latLng, {title: item.$key})
-          .on('click', this.selectMarker.bind(this));
-        markers.addLayer(marker);
-      });
-    });
-    this.map.addLayer(markers);
+  marker. TODO: find a way to get rid of this behaviour :F
+  TODO: test that markers are only added if map exists
+  TODO: test that removes existing markerLayer
+  (we don't want to show old markers when we create the updated layer)
+  */
+  updateMarkerLayer () {
+    if (this.map) {
+      console.log('marker layer updated')
+      if(this.markerLayer) {
+        this.markerLayer.remove();
+      }
+      this.markerLayer = L.markerClusterGroup();
+      _.forEach(this.items, item => {
+          let markerStyle = this.basicMarkerStyle
+
+          let marker = L.marker(item.latLng, {
+            title: item.$key,
+            icon: this.basicMarkerStyle
+          }).on('click', this.selectMarker.bind(this));
+
+          if(item.$key == this.selectedItemId) {
+            this.selectedMarker = marker;
+            this.selectedMarker.setIcon(this.selectedMarkerStyle);
+          }
+
+          this.markerLayer.addLayer(marker);
+        });
+      this.map.addLayer(this.markerLayer);
+    }
   }
 
+  /*
+  Marker doesn't need to be changed as markerSelection will emit a change to
+  map-page.ts which will change @Input:selectedItemId -> ngOnChange will update
+  all of the markers
+  */
   selectMarker(e) {
-    console.log(e.target.options.title);
-    this.selectedMarker.emit(e.target.options.title);
+    this.clearSelection()
+    console.log('selectMarker: marker selected');
+    // this.selectedMarker = e.target;
+    // this.selectedMarker.setIcon(this.selectedMarkerStyle);
+    this.markerSelection.emit(e.target.options.title);
   }
 
   showLoading () {
@@ -142,18 +183,23 @@ export class MapComponent {
   }
 
   selectLocation(e) {
-    this.clearLocationSelection();
-    this.marker = new L.Marker(e.latlng);
-    this.marker.addTo(this.map);
-    this.selectedLocation.emit(e.latlng);
+    this.clearSelection();
+    this.locationMarker = new L.Marker(e.latlng, {icon: this.locationMarkerStyle});
+    this.locationMarker.addTo(this.map);
+    this.locationSelection.emit(e.latlng);
   }
 
-  clearLocationSelection() {
-    if(this.marker) {
-      this.map.removeLayer(this.marker);
-      this.marker = undefined;
-      this.selectedLocation.emit(false);
+  //TODO: test that always emits selectedLocation false (footer will clear)
+  clearSelection() {
+    if(this.locationMarker) {
+      this.map.removeLayer(this.locationMarker);
+      this.locationMarker = undefined;
     };
+    if(this.selectedMarker) {
+      this.selectedMarker.setIcon(this.basicMarkerStyle);
+      this.selectedMarker = undefined;
+    }
+    this.locationSelection.emit(false);
   }
 
   //TODO:alert user

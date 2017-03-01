@@ -5,6 +5,7 @@
   "globalDependencies": {
     "geojson": "registry:dt/geojson#1.0.0+20170130182553",
     "leaflet": "registry:dt/leaflet#1.0.0+20170217142443",
-    "leaflet-markercluster": "registry:dt/leaflet-markercluster#1.0.0+20170118061005"
+    "leaflet-markercluster": "registry:dt/leaflet-markercluster#1.0.0+20170118061005",
+    "leaflet.awesome-markers": "registry:dt/leaflet.awesome-markers#2.0.0+20160919070725"
   }
 }

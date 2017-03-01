@@ -6,4 +6,28 @@ page-list {
     padding: 10px;
   }
 
+  ion-list ion-icon {
+    color: color($colors, primary);
+  }
+
+  button {
+    width: 30%;
+    color: #D3D3D3;
+  }
+
+  .searchbar-wp .searchbar-input-container {
+    border-color: #D3D3D3;
+  }
+
+  // .searchbar-md .searchbar-input{
+  //   box-shadow: none;
+  //   border-width: 1px;
+  //   border-color: color($colors, light);
+  // }
+  //
+  // .searchbar-input-container {
+  //   border-width: 1px;
+  //   border-bottom-width: 1px;
+  //   border-color: color($colors, light);
+  // }
 }

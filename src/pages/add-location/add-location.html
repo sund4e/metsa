@@ -19,25 +19,31 @@
 
 
 <ion-content padding>
+
   <form [formGroup]="form" (ngSubmit)="logForm()">
 
     <ion-item>
       <ion-label floating>Löytynyt herkku</ion-label>
       <ion-input clearInput formControlName="species" type="text"
         placehoder="Löytynyt laji"
-        (input)="listOptions($event.target.value)"
-        ></ion-input>
+        (input)="listOptions($event.target.value)">
+      </ion-input>
     </ion-item>
 
-    <ion-item *ngIf="!form.controls.species.valid  && (form.controls.species.dirty || submitAttempt)">
-      <p>Valitse listasta löytynyt herkku</p>
-    </ion-item>
-
-    <ion-list *ngIf="showList">
+    <ion-list>
       <ion-item *ngFor="let suggestion of suggestions" (click)="selectOption(suggestion)">
         {{ suggestion }}
       </ion-item>
     </ion-list>
+
+    <p>Piseytä apaja</p>
+      <rating
+        formControlName="rating"
+        max="3"
+        emptyStarIconName="ios-basket-outline"
+        halfStarIconName="star-half"
+        starIconName="ios-basket">
+      </rating>
 
     <ion-item>
       <ion-label floating>Muistiinpanot</ion-label>

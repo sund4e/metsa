@@ -21,27 +21,26 @@
   <form [formGroup]="loginForm" (submit)="loginUser()" novalidate>
 
     <ion-item>
-      <ion-label stacked>Sähköpostiosoite</ion-label>
+      <ion-label floating>Sähköpostiosoite</ion-label>
       <ion-input #email formControlName="email" type="email"
-        placeholder="Sähköpostiosoite"
         [class.invalid]="!loginForm.controls.email.valid &&
-          (loginForm.controls.email.touched || submitAttempt)"></ion-input>
+          loginForm.controls.email.touched"></ion-input>
     </ion-item>
     <ion-item class="error-message" *ngIf="!loginForm.controls.email.valid  &&
-      (loginForm.controls.email.touched || submitAttempt)">
+      loginForm.controls.email.touched && loginForm.controls.email.value!=''">
       <p>Sähköpostiosoite on virheellinen</p>
     </ion-item>
 
     <ion-item>
-      <ion-label stacked>Salasana</ion-label>
+      <ion-label floating>Salasana</ion-label>
       <ion-input #password formControlName="password" type="password"
-        placeholder="Salasana"
         [class.invalid]="!loginForm.controls.password.valid &&
-          (loginForm.controls.password.touched || submitAttempt)"></ion-input>
+          loginForm.controls.password.touched">
+      </ion-input>
     </ion-item>
     <ion-item class="error-message" *ngIf="!loginForm.controls.password.valid  &&
-      (loginForm.controls.password.touched || submitAttempt)">
-      <p>Salasanan kuuluu olla vähintään 6 merkkiä</p>
+      loginForm.controls.password.touched && loginForm.controls.password.value!=''">
+      <p>Salasanan tulee olla vähintään 6 merkkiä</p>
     </ion-item>
 
     <button ion-button block class="formbutton" type="submit" [disabled]="!loginForm.valid">

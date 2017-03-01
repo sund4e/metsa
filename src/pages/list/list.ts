@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
 import { NavController, NavParams, ViewController } from 'ionic-angular';
 import {AngularFire, FirebaseListObservable} from 'angularfire2';
-// import {LoadingController} from 'ionic-angular';
+import 'rxjs/add/operator/filter';
+import 'rxjs/add/operator/map';
 import {ItemsService} from '../../providers/items-service';
-import { Geolocation } from 'ionic-native';
+import { Item } from '../../models/item';
+import { Observable, Subscription, Subject } from "rxjs/Rx";
+// import { Geolocation } from 'ionic-native';
 
 
 @Component({
@@ -11,37 +14,78 @@ import { Geolocation } from 'ionic-native';
   templateUrl: 'list.html'
 })
 export class ListPage {
-  itemList: any;
+  itemList: Observable<Item[]>;
+  ratingFilter: number;
+  searchFilter: string;
   searching: boolean = true;
+  subscription: Subscription;
 
   constructor(
     public navCtrl: NavController,
+    public navParams: NavParams,
     public itemService: ItemsService,
     public viewCtrl: ViewController
   ) {
-    Geolocation.getCurrentPosition().then((resp) => {
-       this.getItems(resp.coords.latitude, resp.coords.longitude);
-    }).catch((error) => {
-      console.log('Error getting location', error);
-      this.itemList = itemService.getItems();
-    });
-
+    this.initItems()
   }
 
-  getItems(latitude, longitude) {
-    this.itemList = this.itemService.getSortedItems(latitude, longitude)
-    this.itemList.subscribe(list => {
-      this.searching = false;
-    });
-      // .subscribe(list => {
-      //   this.searching = false;
-      // });
-    // console.log(this.itemList);
-  }
-  dismiss() {
-    this.viewCtrl.dismiss();
+  initItems() {
+    this.itemList = this.navParams.get('itemList');
   }
 
+  getSearchReults(e: any) {
+    this.initItems();
+    this.searchFilter = e.target.value;
+    this.filter();
+  }
 
+  getRatingResults(rating: number) {
+    this.initItems();
+    if(this.ratingFilter == rating) {
+      this.ratingFilter = undefined;
+      return;
+    }
+    this.ratingFilter = rating;
+    this.filter()
+  }
 
+  filter() {
+    console.log('------------');
+    console.log(this.searchFilter);
+    console.log(this.ratingFilter);
+    this.filterSpecies();
+    this.filterRating();
+  }
+
+  filterSpecies() {
+    if (this.searchFilter && this.searchFilter.trim() != '') {
+      this.itemList = this.itemList
+      .map(itemList => {
+        return itemList.filter((item) => {
+          return (item.species.toLowerCase().indexOf(
+            this.searchFilter.toLowerCase()) > -1);
+        });
+      });
+    }
+  }
+
+  //TODO: test that checks that this.ratingFilter exists
+  filterRating() {
+    if (this.ratingFilter) {
+      this.itemList = this.itemList
+      .map(itemList => {
+        return itemList.filter((item) => {
+          return (item.rating == this.ratingFilter);
+        });
+      });
+    }
+  }
+
+  dismiss(item: Item = null) {
+    if(item) {
+      this.viewCtrl.dismiss(item.$key);
+    } else {
+      this.viewCtrl.dismiss();
+    }
+  }
 }
