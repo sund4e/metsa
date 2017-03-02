@@ -6,7 +6,9 @@
 -->
 <ion-header>
   <ion-navbar>
-    <ion-title>Lisää Apaja</ion-title>
+    <!-- <ion-title>:)</ion-title> -->
+    <ion-title *ngIf="!item">Lisää Apaja</ion-title>
+    <ion-title *ngIf="item">Muokkaa Apajaa</ion-title>
 
     <ion-buttons start>
       <button ion-button (click)="dismiss()">

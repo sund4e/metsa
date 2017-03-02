@@ -31,6 +31,10 @@ export class ListPage {
 
   initItems() {
     this.itemList = this.navParams.get('itemList');
+    this.itemList.subscribe((list) => {
+      console.log(list)
+    }).unsubscribe()
+    console.log()
   }
 
   getSearchReults(e: any) {
@@ -50,9 +54,6 @@ export class ListPage {
   }
 
   filter() {
-    console.log('------------');
-    console.log(this.searchFilter);
-    console.log(this.ratingFilter);
     this.filterSpecies();
     this.filterRating();
   }

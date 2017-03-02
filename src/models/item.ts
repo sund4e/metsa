@@ -1,11 +1,12 @@
 import * as moment from 'moment';
+import { LatLng } from './latlng';
 
 export class Item {
   $key: string;
   distance: number; //used to save the distance from current location in km
 
   constructor(
-    public latLng: [number, number] | any,
+    public latLng: LatLng,
     public species: string,
     public notes: string,
     public rating: number,

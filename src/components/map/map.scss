@@ -19,3 +19,16 @@ map {
     }
   }
 }
+
+.easy-button-button {
+  padding: 0px;
+  font-size: 16px;
+
+  .hide-markers-active {
+    color: color($colors, dark);
+  }
+
+  .show-markers-active {
+    color: color($colors, gray);
+  }
+}

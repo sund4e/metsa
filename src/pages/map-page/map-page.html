@@ -18,7 +18,7 @@
 </ion-header>
 
 <ion-content>
-  <map-component [items]="itemList" [selectedItemId]="itemId"
+  <map-component [items]="itemList" [selectedItem]="item"
     (locationSelection)="selectLocation($event)"
     (markerSelection)="showItemBar($event)">
   </map-component>
@@ -28,6 +28,9 @@
 <ion-footer *ngIf="latLng || item" [@fadeInOut]>
   <ion-toolbar *ngIf="latLng">
     <button ion-button block (click)="openEditItemModal()">Lisää apaja!</button>
+    <button ion-button block color="darkgreen" (click)="openListModal(latLng)">
+      Listaa lähellä olevat apajat
+    </button>
   </ion-toolbar>
 
   <ion-card *ngIf="item">
@@ -41,9 +44,9 @@
 
     <!-- <img src="img/advance-card-bttf.png"> -->
 
-    <!-- <ion-card-content>
+    <ion-card-content>
       <p>{{(item | async)?.notes}}</p>
-    </ion-card-content> -->
+    </ion-card-content>
 
     <ion-row>
       <ion-col width-67>

@@ -45,16 +45,16 @@ npm install @types/lodash@4.14.44 --save
 Describe and show how to run the tests with code examples.
 
 ##Todo
--! show notes in map
--! when deleting item, it doesn't disappear from map :F
--! make sure map control buttons work
--! sing out and sign in -> retarded map
--! orientation
--! anonymous account
--! removing item fires toast twice
+-! make sure map control buttons work (test native)
+-! sing out and sign in -> retarded map (test native)
+-! orientation (test native)
 -! handle location errors in map-page.js
+- show apologises to the user if tangram is not working
+- anonymous account
 - mapping firebase errors in Finnish
 - adding possibility to convert anonymous account to user account
 - images
 - analytics : http://blog.pdsullivan.com/posts/2015/02/19/ionicframework-googleanalytics-log-errors.html
 - geofire
+- tests
+- refactor mappage & map.ts

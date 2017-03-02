@@ -8,6 +8,7 @@ import { SettingsPage } from '../settings/settings';
 import { ItemsService } from '../../providers/items-service';
 import { ToastService } from '../../providers/toast-service';
 import { Item } from '../../models/item';
+import { LatLng } from '../../models/latlng';
 import { Observable, Subscription, Subject } from "rxjs/Rx";
 import { Geolocation } from 'ionic-native';
 import * as moment from 'moment';
@@ -32,10 +33,9 @@ import * as moment from 'moment';
 })
 export class MapPage {
   // @ViewChild(Content) content: Content;
-  latLng: Array<number>; //Selected location (no item selected)
+  latLng: LatLng; //Selected location (no item selected)
   itemList: Item[]; //Item objects saved to firebase, passed to map component
   item: Observable<Item>; //Selected item (no location selected)
-  itemId: string; //ID of the selected item (passed to map component)
   itemListObservable: Observable<Item[]> //firebase observable
   itemSubscription: Subscription; //Subscription to the item list from firebase
   locationSubscription: Subscription; //Subscription to the current location
@@ -79,14 +79,10 @@ export class MapPage {
     this.locationSubscription.unsubscribe();
   }
 
+  //Item needs to be passed to map component
   showItemBar(id) {
     this.latLng = undefined;
     this.item = this.itemService.getItem(id);
-    let subscription = this.item.subscribe((item) => {
-      console.log('itemid changed');
-      this.itemId = item.$key;
-    });
-    subscription.unsubscribe();
   }
 
   /*
@@ -94,9 +90,9 @@ export class MapPage {
   mapcomponent so that the markers are showed corretly
   TODO: any better way to pass the itemId to mapcomponent?
   */
-  selectLocation(latLng) {
+  selectLocation(latLng: LatLng) {
     this.item = undefined;
-    this.itemId = undefined;
+    // this.itemId = undefined;
     if(latLng) {
       this.latLng = latLng;
     } else {
@@ -154,8 +150,12 @@ export class MapPage {
 
   //TODO:test that item bar is only opened if an item is passed when modal closes
   //TODO: test that itemListObservable is passed to navParams
-  openListModal() {
-    let modal = this.modalCtrl.create(ListPage, {itemList: this.itemListObservable});
+  openListModal(latLng = null) {
+    let sortedItems = this.itemListObservable;
+    if(latLng) {
+      sortedItems = this.itemService.getSortedItems(latLng.lat, latLng.lng);
+    }
+    let modal = this.modalCtrl.create(ListPage, {itemList: sortedItems});
     modal.onDidDismiss(id => {
       console.log(id);
       if(id) {

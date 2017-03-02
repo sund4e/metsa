@@ -9,12 +9,6 @@ import { Item } from '../models/item';
 import * as _ from 'lodash';
 
 
-/*
-  Generated class for the ItemsService provider.
-
-  See https://angular.io/docs/ts/latest/guide/dependency-injection.html
-  for more info on providers and Angular 2 DI.
-*/
 @Injectable()
 export class ItemsService {
   uid: number
@@ -54,19 +48,6 @@ export class ItemsService {
         .sort(this.compareDistance)
     });
   };
-
-  // getSortedItems(currLat, currLng) {
-  //   return this.itemList.map(items => {
-  //     return items
-  //       .map(item => {
-  //         item.distance = this.calculateDistance(
-  //           currLat, currLng, item.latLng.lat, item.latLng.lng
-  //         );
-  //         return item;
-  //       })
-  //       .sort(this.compareDistance)
-  //   });
-  // };
 
   addItem (item: Item) {
     return this.itemList.push(item)

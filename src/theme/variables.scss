@@ -27,12 +27,15 @@ $button-ios-margin: 1.2rem 0.2rem;
 // The "primary" color is the only required color in the map.
 
 $colors: (
-  primary:    #387ef5,
+  primary:    #72AF26, //#387ef5,
   secondary:  #32db64,
   danger:     #f53d3d,
   light:      #f4f4f4,
   dark:       #222,
-  grey:       #D3D3D3
+  grey:       #D3D3D3,
+  darkgreen:  #728224,
+  lightgreen: #D0EBB7,
+  green:      #96D86C //#72AF26
 );
 
 

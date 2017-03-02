@@ -1,9 +1,11 @@
 import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {Http} from '@angular/http';
 import {LoadingController} from 'ionic-angular';
+// import 'rxjs/add/operator/contains';
 // import { FirebaseListObservable} from 'angularfire2';
 import { Observable, Subscription } from "rxjs/Rx";
 import { Item } from '../../models/item';
+import { LatLng } from '../../models/latlng';
 import L from 'leaflet';
 import 'leaflet.locatecontrol';
 import 'leaflet-geocoder-mapzen';
@@ -25,14 +27,16 @@ declare var Tangram: any;
 export class MapComponent {
   // @ViewChild('map') map;
   @Input() items: Item[];
-  @Input() selectedItemId: string;
+  @Input() selectedItem: Observable<Item>;
   @Output() locationSelection = new EventEmitter();
   @Output() markerSelection = new EventEmitter();
   map: any;
   loading: any;
   locationMarker: any; //Marker for the selected location
   selectedMarker: any; //Marker for the item that has been selected
+  // selectedItemId: string;
   markerLayer: any; //Markers for the items list
+  autozoom: number = 16; //Automatic zoom level when selecting markers
 
   basicMarkerStyle = L.AwesomeMarkers.icon({
     icon: 'star',
@@ -60,10 +64,29 @@ export class MapComponent {
     setTimeout(this.loadMap.bind(this), 100);
   }
 
-  //Update markers every time @Input items changes
+  /*
+  Update markers every time @Inputs change
+  Update this.selectedItem when @Input:selectedItem changes so that selected
+  item is rendered differently when updating the markers. Also, center map to
+  selection (if map is defined)
+  */
   ngOnChanges(changes: any) {
-    console.log('ngChange fired');
+    console.log('changes in map.ts @Input');
+    console.log(changes);
+    if (changes.selectedItem) {
+      this.focusMapToSelectedItem()
+    }
     this.updateMarkerLayer();
+  }
+
+  focusMapToSelectedItem() {
+    if (this.selectedItem && this.map) {
+      this.selectedItem.subscribe((item) => {
+        let zoom = this.map.getZoom() > this.autozoom ? this.map.getZoom() : this.autozoom;
+        console.log(zoom);
+        this.map.setView([item.latLng.lat, item.latLng.lng], zoom);
+      }).unsubscribe();
+    }
   }
 
   loadMap() {
@@ -73,10 +96,11 @@ export class MapComponent {
         zoomControl: false,
         maxZoom: 20
       })
-      .locate({setView: true, maxZoom: 16})
+      .locate({setView: true, maxZoom: this.autozoom})
       .whenReady(this.dismissLoading.bind(this))
       .on('contextmenu', this.selectLocation.bind(this))
       .on('click', this.clearSelection.bind(this))
+      .on('locationfound', () => {console.log(event)})
       .on('locationerror', this.handleLocationError.bind(this));
 
     Tangram
@@ -102,26 +126,40 @@ export class MapComponent {
     L.control.locate({
       position: 'topleft',
       keepCurrentZoomLevel: true,
-      icon: 'fa fa-location-arrow'
+      icon: 'fa fa-location-arrow',
+      locateOptions: {watch: true},
+      onLocationError: (e) => {
+        console.log('Location error in leaflet locate control:');
+        console.log(e);
+      }
       // icon: 'fa fa-compass'
     }).addTo(this.map);
 
     L.easyButton({
-      id: 'id-for-the-button',  // an id for the generated button
-      position: 'topleft',      // inherited from L.Control -- the corner it goes in
-      type: 'animate',          // set to animate when you're comfy with css
+      id: 'id-for-the-button',
+      position: 'topleft',
+      // type: 'animate',
       leafletClasses: true,     // use leaflet classes to style the button?
-      states:[{                 // specify different icons and responses for your button
-        stateName: 'get-center',
-        onClick: function(button, map){
-          console.log('YAY!');
-        },
-        icon: 'fa-shopping-basket'
+      states:[{
+        stateName: 'hide-markers',
+        icon: 'fa-map-marker',
+        onClick: (control) => {
+          if(this.markerLayer) {
+            console.log('remove markers')
+            this.markerLayer.remove();
+            control.state('show-markers');
+          }
+        }
+      }, {
+        stateName: 'show-markers',
+        icon: 'fa-map-marker',
+        onClick: (control) => {
+          console.log('show markers')
+          this.updateMarkerLayer();
+          control.state('hide-markers');
+        }
       }]
     }).addTo(this.map);
-
-    // this.addMarkers();
-
   }
 
   /*
@@ -137,7 +175,11 @@ export class MapComponent {
       if(this.markerLayer) {
         this.markerLayer.remove();
       }
-      this.markerLayer = L.markerClusterGroup();
+      this.markerLayer = L.markerClusterGroup({
+        maxClusterRadius: 30
+      });
+
+
       _.forEach(this.items, item => {
           let markerStyle = this.basicMarkerStyle
 
@@ -146,7 +188,7 @@ export class MapComponent {
             icon: this.basicMarkerStyle
           }).on('click', this.selectMarker.bind(this));
 
-          if(item.$key == this.selectedItemId) {
+          if(this.isSelectedItem(item)) {
             this.selectedMarker = marker;
             this.selectedMarker.setIcon(this.selectedMarkerStyle);
           }
@@ -155,6 +197,17 @@ export class MapComponent {
         });
       this.map.addLayer(this.markerLayer);
     }
+  }
+
+  isSelectedItem(item: Item): boolean {
+    if(!this.selectedItem) {
+      return;
+    }
+    let isSame: boolean;
+    this.selectedItem.subscribe((selectedItem) => {
+        isSame = selectedItem.$key == item.$key;
+    }).unsubscribe();
+    return isSame;
   }
 
   /*
@@ -205,7 +258,7 @@ export class MapComponent {
   //TODO:alert user
   handleLocationError(e) {
     this.map.setView([64, 26], 5);
-    console.log('Location error:')
+    console.log('Location error in leaflet map:')
     console.log(e.message);
   }
 }

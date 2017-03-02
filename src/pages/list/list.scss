@@ -10,8 +10,12 @@ page-list {
     color: color($colors, primary);
   }
 
+  ion-buttons {
+    padding-left: 8px;
+  }
+
   button {
-    width: 30%;
+    width: 31%;
     color: #D3D3D3;
   }
 
