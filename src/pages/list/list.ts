@@ -31,10 +31,6 @@ export class ListPage {
 
   initItems() {
     this.itemList = this.navParams.get('itemList');
-    this.itemList.subscribe((list) => {
-      console.log(list)
-    }).unsubscribe()
-    console.log()
   }
 
   getSearchReults(e: any) {

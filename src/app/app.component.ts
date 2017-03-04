@@ -2,13 +2,9 @@ import { Component, ViewChild } from '@angular/core';
 import { Nav, Platform } from 'ionic-angular';
 import { StatusBar, Splashscreen } from 'ionic-native';
 import { AngularFire } from 'angularfire2';
-// import { TabsPage } from '../pages/tabs/tabs';
-
 import { MapPage } from '../pages/map-page/map-page';
-// import { Page2 } from '../pages/page2/page2';
-// import { ListPage } from '../pages/list/list';
-// import { SettingsPage} from '../pages/settings/settings';
 import { LoginPage } from '../pages/login/login';
+import { Geolocation } from 'ionic-native';
 
 
 @Component({
@@ -35,6 +31,7 @@ export class MyApp {
         authObserver.unsubscribe();
       }
     });
+
 
     this.initializeApp();
 

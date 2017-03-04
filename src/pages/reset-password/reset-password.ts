@@ -4,20 +4,14 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { EmailValidator } from '../../validators/email-validator';
 import { AuthService } from '../../providers/auth-service';
 import { ToastService } from '../../providers/toast-service';
-import { MapPage} from '../map-page/map-page';
+import { LoginPage } from '../login/login';
 
-/*
-  Generated class for the Signup page.
-
-  See http://ionicframework.com/docs/v2/components/#navigation for more info on
-  Ionic pages and navigation.
-*/
 @Component({
-  selector: 'page-signup',
-  templateUrl: 'signup.html'
+  selector: 'page-reset-password',
+  templateUrl: 'reset-password.html'
 })
-export class SignupPage {
-  signupForm: any;
+export class ResetPasswordPage {
+  form: any;
   loading: any;
 
   constructor(
@@ -27,28 +21,27 @@ export class SignupPage {
     public formBuilder: FormBuilder,
     public loadingCtrl: LoadingController
   ) {
-    this.signupForm = formBuilder.group({
+    this.form = formBuilder.group({
       email: ['', Validators.compose([
         Validators.required,
         EmailValidator.isValid
-      ])],
-      password: ['', Validators.compose([
-        Validators.minLength(6),
-        Validators.required
       ])]
     });
   }
 
-  createUser() {
-    this.auth.signupUser(this.signupForm.value.email, this.signupForm.value.password)
-    .then( authData => {
-      this.nav.setRoot(MapPage);
-      this.toast.showSuccess('Käyttäjä luotu');
-    }, (error: any) => {
+  resetPassword() {
+    this.auth.resetPassword(this.form.value.email)
+    .then(
+      (authData) => {
+        this.nav.pop();
+        this.toast.showFail('Salasana lähetetty sähköpostiin');
+      },
+      (error: any) => {
       this.loading.dismiss().then(() => {
         console.log(error);
-        if (error.code == 'auth/email-already-in-use') {
-          this.toast.showFail('Sähköpostiosoite on jo käytössä');
+        if (error.code == 'auth/user-not-found') {
+          this.toast.showFail('Sähköpostiosoite ei vastaa yhtään käyttäjää, '+
+          'tarkista osoite');
         } else {
           this.toast.showFail('Virhe tilin luonnissa: ' + error.message);
         }
@@ -60,5 +53,4 @@ export class SignupPage {
     });
     this.loading.present();
   }
-
 }

@@ -44,7 +44,6 @@ export class AddLocationPage {
   }
 
   listOptions(value) {
-    console.log(value);
     if(value == '') {
       this.suggestions = [];
     } else {

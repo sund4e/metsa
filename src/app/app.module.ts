@@ -3,6 +3,7 @@ import { IonicApp, IonicModule, IonicErrorHandler } from 'ionic-angular';
 import { MyApp } from './app.component';
 import { LoginPage } from '../pages/login/login';
 import { SignupPage } from '../pages/signup/signup';
+import { ResetPasswordPage } from '../pages/reset-password/reset-password'
 import { MapPage } from '../pages/map-page/map-page';
 import {AddLocationPage} from '../pages/add-location/add-location';
 import {ListPage} from '../pages/list/list';
@@ -37,6 +38,7 @@ const myFirebaseAuthConfig = {
     MyApp,
     LoginPage,
     SignupPage,
+    ResetPasswordPage,
     MapPage,
     MapComponent,
     AddLocationPage,
@@ -54,6 +56,7 @@ const myFirebaseAuthConfig = {
     MyApp,
     LoginPage,
     SignupPage,
+    ResetPasswordPage,
     MapPage,
     AddLocationPage,
     ListPage,

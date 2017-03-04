@@ -6,6 +6,7 @@ import { AuthService } from '../../providers/auth-service';
 import { ToastService } from '../../providers/toast-service';
 import { MapPage} from '../map-page/map-page';
 import { SignupPage } from '../signup/signup';
+import { ResetPasswordPage } from '../reset-password/reset-password';
 
 
 /*
@@ -44,7 +45,7 @@ export class LoginPage {
 
   goToResetPassword(){
     // check help from here: https://javebratt.com/angularfire2-email-auth/
-    // this.nav.push(ResetPasswordPage);
+    this.nav.push(ResetPasswordPage);
   }
 
   createAccount(){

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFire, AuthProviders, FirebaseAuthState, AuthMethods } from 'angularfire2';
 import { LoginPage } from '../pages/login/login';
+import { Observable, Subscription } from "rxjs/Rx";
 import firebase from 'firebase';
 
 
@@ -9,12 +10,6 @@ export class AuthService {
   fireAuth: any;
 
   constructor (public af: AngularFire) {
-    af.auth.subscribe( user => {
-      if (user) {
-        this.fireAuth = user.auth;
-        console.log(this.fireAuth);
-      }
-    });
   }
 
   loginUser (mail: string, pwrd: string): firebase.Promise<FirebaseAuthState> {
@@ -39,15 +34,19 @@ export class AuthService {
     return this.af.auth.createUser({ email: mail, password: pwrd });
   }
 
-  isAuthenticated() {
-    if (this.fireAuth) {
-      return true;
-    }
-    return false;
+  resetPassword(email: string): firebase.Promise<any> {
+    return firebase.auth().sendPasswordResetEmail(email);
   }
 
-  getUserID() {
-    return this.fireAuth.uid;
+  //We need to subcribe to userID in items sevice as the uid there has to be
+  //correct al all times
+  getUserID(): Observable<string> {
+    return this.af.auth.map(user => {
+      if(user) {
+        return user.uid;
+      }
+      return null;
+    });
   }
 
 }

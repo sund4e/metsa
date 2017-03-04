@@ -22,8 +22,4 @@ export class SettingsPage {
     this.auth.logoutUser();
   }
 
-  dismiss() {
-    this.viewCtrl.dismiss();
-  }
-
 }

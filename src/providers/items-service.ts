@@ -11,7 +11,7 @@ import * as _ from 'lodash';
 
 @Injectable()
 export class ItemsService {
-  uid: number
+  uid: string
   itemList: FirebaseListObservable<any>;
 
 
@@ -20,8 +20,13 @@ export class ItemsService {
     public af: AngularFire,
     public toast: ToastService
   ) {
-      this.uid = this.auth.getUserID();
-      this.itemList = af.database.list('/users/' + this.uid)
+      //Subscribing ensures that uid is up to date at all times
+      let observable = this.auth.getUserID()
+      observable.subscribe(uid => {
+        this.uid = uid;
+        this.itemList = af.database.list('/users/' + this.uid)
+        console.log('itemList establsihed: /users/' + this.uid);
+      });
   }
 
   getItems (): Observable<Item[]> {

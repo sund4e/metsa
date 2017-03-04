@@ -3,11 +3,11 @@
 
     <ion-title>Kartta</ion-title>
 
-    <ion-buttons right>
+    <!-- <ion-buttons right>
       <button ion-button icon-only (click)="openListModal()">
         <ion-icon name="ios-menu"></ion-icon>
       </button>
-    </ion-buttons>
+    </ion-buttons> -->
 
     <ion-buttons right>
       <button ion-button icon-only (click)="openSettingsModal()">
@@ -20,12 +20,13 @@
 <ion-content>
   <map-component [items]="itemList" [selectedItem]="item"
     (locationSelection)="selectLocation($event)"
-    (markerSelection)="showItemBar($event)">
+    (markerSelection)="showItemBar($event)"
+    (hideFooter) = "hideFooter($event)">
   </map-component>
   <!-- <ion-img src='assets/img/img.jpg'></ion-img> -->
 </ion-content>
 
-<ion-footer *ngIf="latLng || item" [@fadeInOut]>
+<ion-footer *ngIf="(latLng || item) && !hiddenFooter" [@fadeInOut]>
   <ion-toolbar *ngIf="latLng">
     <button ion-button block (click)="openEditItemModal()">Lisää apaja!</button>
     <button ion-button block color="darkgreen" (click)="openListModal(latLng)">
@@ -49,13 +50,13 @@
     </ion-card-content>
 
     <ion-row>
-      <ion-col width-67>
+      <ion-col width-50>
         <button ion-button icon-left clear small>
           <ion-icon name="ios-basket-outline"></ion-icon>
           <div>{{(item | async)?.rating}}</div>
         </button>
       </ion-col>
-      <ion-col widith-33>
+      <ion-col widith-50>
         <ion-buttons right>
           <button ion-button icon-left clear small
             (click)="openEditItemModal()">

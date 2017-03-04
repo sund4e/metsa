@@ -39,6 +39,7 @@ export class MapPage {
   itemListObservable: Observable<Item[]> //firebase observable
   itemSubscription: Subscription; //Subscription to the item list from firebase
   locationSubscription: Subscription; //Subscription to the current location
+  hiddenFooter: boolean = false;
 
   //TODO: test that itemList is updated when items updated in firebase
   constructor(
@@ -48,24 +49,54 @@ export class MapPage {
     public alert: AlertController,
     public toast: ToastService
   ) {
-    this.locationSubscription = Geolocation.watchPosition()
-    // .filter((p) => p.coords !== undefined) //Filter Out Errors
-    .subscribe(position => {
-      if (!position.coords) {
-        toast.showFail('Sijaintitiedot ei saatavissa')
-        console.log('error getting location:')
-        console.log(position)
-        this.itemListObservable = itemService.getItems();
-      } else {
-        this.itemListObservable = itemService.getSortedItems(
-          position.coords.latitude, position.coords.longitude
-        );
-      }
-      this.itemSubscription = this.itemListObservable.subscribe((list) => {
-        this.itemList = list;
-      });
+    this.itemListObservable = this.itemService.getItems();
+    this.itemSubscription = this.itemListObservable.subscribe((list) => {
+      this.itemList = list;
     });
 
+    // let locationSuccess = (position) => {
+    //   console.log('Location found!!');
+    //   console.log(position);
+    //   this.itemListObservable = this.itemService.getSortedItems(
+    //     position.coords.latitude, position.coords.longitude
+    //   )
+    //   this.itemSubscription = this.itemListObservable.subscribe((list) => {
+    //     this.itemList = list;
+    //   });
+    // }
+    //
+    // let locationError = (error) => {
+    //   console.log('Location not found :(');
+    //   console.log(error.message);
+    //   if(error.TIMEOUT) {
+    //     this.toast.showFail('Sijaintietoa ei löytynyt');
+    //   } else if (error.POSITION_UNAVAILABLE) {
+    //     this.toast.showFail('Satelliittipaikannukseen ei saatu yhteyttä')
+    //   } else if(error.PERMISSION_DENIED) {
+    //     this.toast.showFail(
+    //       'Ei käyttöoikeutta sijaintitietoihin, takista puhelimen asetukset'
+    //     )
+    //   } else {
+    //     this.toast.showFail(error.message)
+    //   }
+    //   this.itemListObservable = this.itemService.getItems();
+    //   this.itemSubscription = this.itemListObservable.subscribe((list) => {
+    //     this.itemList = list;
+    //   });
+    // }
+    //
+    // /*
+    // Needs timeout as otherwise the locationError callback will not be fired
+    // MaxAge acceps a cached position no older than speciefied
+    // https://github.com/apache/cordova-plugin-geolocation
+    // */
+    // navigator.geolocation.watchPosition(
+    //   locationSuccess, locationError, {
+    //     enableHighAccuracy: true,
+    //     maximumAge: 5000,
+    //     timeout: 10000
+    //   }
+    // );
   }
 
   /*
@@ -74,7 +105,6 @@ export class MapPage {
   and throws an error
   */
   ionViewDidLeave() {
-    console.log('map-page.ts did leave');
     this.itemSubscription.unsubscribe();
     this.locationSubscription.unsubscribe();
   }
@@ -100,13 +130,16 @@ export class MapPage {
     }
   }
 
+  hideFooter(event: boolean) {
+    this.hiddenFooter = event;
+  }
+
   openEditItemModal() {
     let modal;
     if (this.item) {
-      let subscription = this.item.subscribe((item) => {
+      this.item.subscribe((item) => {
         modal = this.modalCtrl.create(AddLocationPage, { item: item });
-      });
-      subscription.unsubscribe();
+      }).unsubscribe();
     } else {
       modal = this.modalCtrl.create(AddLocationPage, { latLng: this.latLng });
     }
@@ -125,14 +158,11 @@ export class MapPage {
           text: 'Peruuta',
           role: 'cancel',
           handler: () => {
-            console.log('Cancel clicked');
-            // alert.dismiss();
           }
         },
         {
           text: 'Poista',
           handler: () => {
-            console.log('Buy clicked');
             this.deleteItem(this.item);
           }
         }
@@ -142,7 +172,7 @@ export class MapPage {
   }
 
   deleteItem(observable: Observable<Item>) {
-    let subscription = observable.subscribe((item) => {
+    observable.subscribe((item) => {
       this.itemService.deleteItem(item.$key);
       this.item = undefined;
     });
@@ -150,14 +180,10 @@ export class MapPage {
 
   //TODO:test that item bar is only opened if an item is passed when modal closes
   //TODO: test that itemListObservable is passed to navParams
-  openListModal(latLng = null) {
-    let sortedItems = this.itemListObservable;
-    if(latLng) {
-      sortedItems = this.itemService.getSortedItems(latLng.lat, latLng.lng);
-    }
+  openListModal(latLng) {
+    let sortedItems = this.itemService.getSortedItems(latLng.lat, latLng.lng);
     let modal = this.modalCtrl.create(ListPage, {itemList: sortedItems});
     modal.onDidDismiss(id => {
-      console.log(id);
       if(id) {
         this.showItemBar(id);
       }

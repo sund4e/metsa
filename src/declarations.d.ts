@@ -34,7 +34,8 @@ declare namespace L {
     }
 
     export interface Locate extends L.Control {
-
+      start(): this,
+      stop(): this
     }
 
     export interface GeocoderStatic {

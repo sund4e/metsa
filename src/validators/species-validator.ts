@@ -66,37 +66,3 @@ export class SpeciesValidator implements Validator {
     return null;
   }
 }
-
-// export class SpeciesValidator {
-//   // validator: Function;
-//   // testi: any = "jjeeje"
-//   //
-//   // constructor(speciesService: SpeciesService) {
-//   //   this.validator = this.validateSpecies(speciesService)
-//   // }
-//
-//   static isValid(control: FormControl, speciesService: SpeciesService): any {
-//     // return this.validator(control)
-//
-//     console.log(speciesService);
-//     if (control.value > 120){
-//         return {
-//             "not realistic": true
-//         };
-//     }
-//
-//     return null;
-//   }
-//
-//   // function validateSpecies(speciesService: SpeciesService) {
-//   //   return (control: FormControl) => {
-//   //     let validSpeciesNames = speciesService.getSpeciesList();
-//   //
-//   //     if (validSpeciesNames.indexOf(control.value.toLowerCase()) == -1){
-//   //       return {
-//   //           "not valid species": true
-//   //       };
-//   //     };
-//   //     return null;
-//   //   };
-//   // }

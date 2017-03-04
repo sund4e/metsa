@@ -17,26 +17,26 @@
   <form [formGroup]="signupForm" (submit)="createUser()" novalidate>
 
     <ion-item>
-      <ion-label stacked>Sähköpostiosoite</ion-label>
+      <ion-label floating>Sähköpostiosoite</ion-label>
       <ion-input #email formControlName="email" type="email"
         placeholder="Sähköpostiosoite"
         [class.invalid]="!signupForm.controls.email.valid &&
-          (signupForm.controls.email.dirty || submitAttempt)"></ion-input>
+          signupForm.controls.email.touched"></ion-input>
     </ion-item>
     <ion-item class="error-message" *ngIf="!signupForm.controls.email.valid  &&
-      (signupForm.controls.email.touched || submitAttempt)">
+      signupForm.controls.email.touched && signupForm.controls.email.value!=''">
       <p>Sähköpostiosoite on virheellinen</p>
     </ion-item>
 
     <ion-item>
-      <ion-label stacked>Salasana</ion-label>
+      <ion-label floating>Salasana</ion-label>
       <ion-input #password formControlName="password" type="password"
         placeholder="Salasana"
         [class.invalid]="!signupForm.controls.password.valid &&
-          (signupForm.controls.password.dirty || submitAttempt)"></ion-input>
+          signupForm.controls.password.touched && signupForm.controls.password.value!=''"></ion-input>
     </ion-item>
     <ion-item class="error-message" *ngIf="!signupForm.controls.password.valid  &&
-      (signupForm.controls.password.touched || submitAttempt)">
+      signupForm.controls.password.touched">
       <p>Salasanan kuuluu olla vähintään 6 merkkiä</p>
     </ion-item>
 
