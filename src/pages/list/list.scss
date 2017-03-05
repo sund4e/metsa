@@ -23,6 +23,10 @@ page-list {
     border-color: #D3D3D3;
   }
 
+  [padding] h2:first-child {
+    margin-top: 2px;
+  }
+
   // .searchbar-md .searchbar-input{
   //   box-shadow: none;
   //   border-width: 1px;

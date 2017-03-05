@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
 
-    <ion-title>Kartta</ion-title>
+    <ion-title>Apajat Kartalla</ion-title>
 
     <!-- <ion-buttons right>
       <button ion-button icon-only (click)="openListModal()">
@@ -30,7 +30,7 @@
   <ion-toolbar *ngIf="latLng">
     <button ion-button block (click)="openEditItemModal()">Lisää apaja!</button>
     <button ion-button block color="darkgreen" (click)="openListModal(latLng)">
-      Listaa lähellä olevat apajat
+      Listaa valinnan lähellä olevat apajat
     </button>
   </ion-toolbar>
 
@@ -51,10 +51,11 @@
 
     <ion-row>
       <ion-col width-50>
-        <button ion-button icon-left clear small>
-          <ion-icon name="ios-basket-outline"></ion-icon>
-          <div>{{(item | async)?.rating}}</div>
-        </button>
+          <div class="rating">
+            <ion-icon name="ios-basket-outline" *ngIf="(item | async)?.rating >= 1"></ion-icon>
+            <ion-icon name="ios-basket-outline" *ngIf="(item | async)?.rating >= 2"></ion-icon>
+            <ion-icon name="ios-basket-outline"*ngIf="(item | async)?.rating >= 3"></ion-icon>
+          </div>
       </ion-col>
       <ion-col widith-50>
         <ion-buttons right>

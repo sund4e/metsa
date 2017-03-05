@@ -100,29 +100,40 @@ export class MapComponent {
     this.map = L
       .map('map', {
         zoomControl: false,
-        maxZoom: 20
+        maxZoom: 18
       })
-      .locate({setView: true, maxZoom: this.autozoom, watch: true})
+      .locate({watch: true})
       .whenReady(this.dismissLoading.bind(this))
-      // .on('click', this.selectLocation.bind(this))
+      .on('click', this.onMapClick.bind(this))
       .on('contextmenu', this.selectLocation.bind(this))
-      .on('dblclick', this.selectLocation.bind(this))
-      .on('click', this.clearSelection.bind(this))
+      // .on('dblclick', this.selectLocation.bind(this))
+      // .on('click', this.clearSelection.bind(this))
       .on('locationfound', this.onLocationFound.bind(this))
       .on('locationerror', this.onLocationError.bind(this));
 
-    Tangram
-      .leafletLayer({
-          scene: {
-            import: 'https://mapzen.com/carto/walkabout-style-more-labels/walkabout-style-more-labels.yaml',
-            global: { sdk_mapzen_api_key: 'mapzen-xe5PErc' }
-          },
-          // allowCrossDomainWorkers: true
-          attribution: '© <a href="https://www.mapzen.com/rights">Mapzen</a>, \
-            <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>, \
-            and <a href="https://www.mapzen.com/rights/#services-and-data-sources">others</a>'
-      })
-      .addTo(this.map);
+    // TANGRAM
+    // Tangram
+    //   .leafletLayer({
+    //       scene: {
+    //         import: 'https://mapzen.com/carto/walkabout-style-more-labels/walkabout-style-more-labels.yaml',
+    //         global: { sdk_mapzen_api_key: 'mapzen-xe5PErc' }
+    //       },
+    //       // allowCrossDomainWorkers: true
+    //       attribution: '© <a href="https://www.mapzen.com/rights">Mapzen</a>, \
+    //         <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>, \
+    //         and <a href="https://www.mapzen.com/rights/#services-and-data-sources">others</a>'
+    //   })
+    //   .addTo(this.map);
+
+    //MAPBOX
+    L.tileLayer('https://api.mapbox.com/styles/v1/sund4e/ciypy5ilf002i2rplpofrnyfi/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic3VuZDRlIiwiYSI6ImNpeXB5NDR6NzAwMDAycXBhaTl6anowMWEifQ.Z8v1RFN4cnjaY6FIykoh-Q', {
+      attribution: 'Map & Search data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> ' +
+      'contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+      'Imagery © <a href="http://mapbox.com">Mapbox</a>, ' +
+      'Search © <a href="https://www.mapzen.com/rights">Mapzen</a> ' +
+      'and <a href="https://www.mapzen.com/rights/#services-and-data-sources">others</a>.',
+      maxZoom: 18,
+    }).addTo(this.map);
 
     L.control.geocoder('mapzen-xe5PErc', {
       markers: false,
@@ -130,12 +141,11 @@ export class MapComponent {
     })
       .addTo(this.map)
       .on('select', this.selectLocation.bind(this))
-      .on('expand', () => {this.hideFooter.emit(true)})
-      .on('collapse', () => {this.hideFooter.emit(false)});
+      .on('focus', () => {this.hideFooter.emit(true)})
+      .on('blur', () => {this.hideFooter.emit(false)});
 
-    // this.setLocationControl()
 
-    L.easyButton('fa-crosshairs', this.selectCurrentLocation.bind(this))
+    L.easyButton('fa-crosshairs', this.goToCurrentLocation.bind(this))
     .addTo(this.map);
 
     L.easyButton({
@@ -145,7 +155,7 @@ export class MapComponent {
       leafletClasses: true,     // use leaflet classes to style the button?
       states:[{
         stateName: 'hide-markers',
-        icon: 'fa-map-marker',
+        icon: 'fa-star',
         onClick: (control) => {
           if(this.markerLayer) {
             this.markerLayer.remove();
@@ -154,7 +164,7 @@ export class MapComponent {
         }
       }, {
         stateName: 'show-markers',
-        icon: 'fa-map-marker',
+        icon: 'fa-star',
         onClick: (control) => {
           this.updateMarkerLayer();
           control.state('hide-markers');
@@ -165,23 +175,9 @@ export class MapComponent {
     this.updateMarkerLayer();
   }
 
-  // setLocationControl() {
-  //   var locate = L.control.locate({
-  //     position: 'topleft',
-  //     keepCurrentZoomLevel: true,
-  //     icon: 'fa fa-location-arrow',
-  //     locateOptions: {watch: true},
-  //     onLocationError: (e) => {
-  //       console.log('Location error in leaflet locate control:');
-  //       console.log(e);
-  //     }
-  //     // icon: 'fa fa-compass'
-  //   })
-  //   .addTo(this.map);
-  //   // locate.start();
-  //
-  // }
-
+  //if the location layer doesn't exist, set the map's view to the location
+  // -> map centered only when location found the first time, after that only
+  // draws the circle
   onLocationFound(e) {
     console.log('LOCATION: found in map :)')
     this.location = e.latlng;
@@ -199,7 +195,10 @@ export class MapComponent {
 
     if (this.locationLayer) {
       this.locationLayer.clearLayers();
+    } else {
+      this.map.setView(this.location, this.autozoom);
     }
+
     this.locationLayer = L.layerGroup([locationMarker, accuracyMarker])
     .addTo(this.map);
   }
@@ -211,10 +210,11 @@ export class MapComponent {
     console.log(e);
   }
 
-  selectCurrentLocation () {
+  goToCurrentLocation () {
     this.map.setView(this.location, this.autozoom);
-    let e = {latlng: this.location}
-    console.log(e);
+    this.clearSelection();
+    // let e = {latlng: this.location}
+    // console.log(e);
     // this.selectLocation(e);
   }
   /*
@@ -286,6 +286,14 @@ export class MapComponent {
     this.loading.dismiss()
   }
 
+  onMapClick(e) {
+    if(this.locationMarker || this.selectedMarker) {
+      this.clearSelection();
+    } else {
+      this.selectLocation(e);
+    }
+  }
+
   //TODO: test that footer is not hidden (in a case we end up here from search)
   selectLocation(e) {
     this.clearSelection();
@@ -309,9 +317,9 @@ export class MapComponent {
   }
 
   //TODO:alert user
-  handleLocationError(e) {
-    this.map.setView([64, 26], 5);
-    console.log('Location error in leaflet map:')
-    console.log(e.message);
-  }
+  // handleLocationError(e) {
+  //   this.map.setView([64, 26], 5);
+  //   console.log('Location error in leaflet map:')
+  //   console.log(e.message);
+  // }
 }

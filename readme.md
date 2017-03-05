@@ -61,12 +61,22 @@ npm install @types/lodash@4.14.44 --save
 Describe and show how to run the tests with code examples.
 
 ##Todos
--! Mapbox!
+- itemlist marigin
+<!-- -! Mapbox! -->
 <!-- -! Change logic for near you list -->
 <!-- -! Mark your location as apaja -->
 <!-- -! double click as well as long tap to mark -->
 <!-- -! dismiss apaja if location search is opened -->
--! Own Splashcreen
+<!-- -! Own Splashcreen -->
+
+- alasvetolista epäselvä
+
+Kehitysidikset:
+- reitit apajille
+- mahdollisuus jakaa tietyille käyttäjille
+- päivitysmahdollisuus (kommentit apajille)
+- Notes ei rivity nätisti
+
 
 - show apologises to the user if tangram is not working
 - splashscreen

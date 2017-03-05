@@ -20,4 +20,10 @@ map-page {
   .footer-md::before {
     background-image: none;
   }
+
+  .rating {
+    padding-left: 16px;
+    margin: 1.2rem 0.2rem;
+    // color: color($colors, darkgreen);
+  }
 }
