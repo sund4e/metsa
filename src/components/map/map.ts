@@ -2,6 +2,8 @@ import {Component, Input, Output, EventEmitter} from '@angular/core';
 import {Http} from '@angular/http';
 import {LoadingController} from 'ionic-angular';
 import { ToastService } from '../../providers/toast-service';
+import { Diagnostic } from 'ionic-native';
+
 // import 'rxjs/add/operator/contains';
 // import { FirebaseListObservable} from 'angularfire2';
 import { Observable, Subscription } from "rxjs/Rx";
@@ -59,12 +61,62 @@ export class MapComponent {
     prefix: 'fa'
   });
 
-  constructor (public loadingCtrl: LoadingController, public toast: ToastService) {}
+  constructor (public loadingCtrl: LoadingController,public toast: ToastService) {}
 
+  //Check that location has been authorized before loading the map
+  //Load the map anyways :D
   ngAfterViewInit() {
     this.loading = this.showLoading();
-    //load map doesn't fire without timeout TODO: any other workaroud?
-    setTimeout(this.loadMap.bind(this), 100);
+    this.checkRuntimePermissions().then(() => {
+      console.log('Location permissions checked')
+      setTimeout(this.loadMap.bind(this), 100);
+    })
+    .catch((error) => {
+      console.log('Location permissions error: ' + error);
+      setTimeout(this.loadMap.bind(this), 100);
+    })
+  }
+
+  checkRuntimePermissions() {
+    return Diagnostic.getPermissionsAuthorizationStatus([
+      Diagnostic.permission.ACCESS_FINE_LOCATION,
+      Diagnostic.permission.ACCESS_COARSE_LOCATION
+    ])
+    .then((permissions) => {
+      console.log('ACCESS_FINE_LOCATION: ' + permissions.ACCESS_FINE_LOCATION)
+      console.log('ACCESS_COARSE_LOCATION: ' + permissions.ACCESS_COARSE_LOCATION)
+      let isGranted =
+        permissions.ACCESS_FINE_LOCATION == Diagnostic.permissionStatus.GRANTED &&
+        permissions.ACCESS_COARSE_LOCATION == Diagnostic.permissionStatus.GRANTED;
+
+      if(!isGranted) {
+        return this.requestRuntimePermissions();
+      }
+    })
+    .catch((error) => {
+      console.error('ERROR getting authorization status: ' + error);
+    });
+  }
+
+  requestRuntimePermissions() {
+    return Diagnostic.requestRuntimePermissions([
+      Diagnostic.permission.ACCESS_FINE_LOCATION,
+      Diagnostic.permission.ACCESS_COARSE_LOCATION
+    ])
+    .then((permissions) => {
+      console.log('ACCESS_FINE_LOCATION: ' + permissions.ACCESS_FINE_LOCATION)
+      console.log('ACCESS_COARSE_LOCATION: ' + permissions.ACCESS_COARSE_LOCATION)
+      let isGranted =
+        permissions.ACCESS_FINE_LOCATION == Diagnostic.permissionStatus.GRANTED &&
+        permissions.ACCESS_COARSE_LOCATION == Diagnostic.permissionStatus.GRANTED;
+
+      if(!isGranted) {
+        this.toast.showFail('Sovelluksella ei ole lupaa sijaintitietojen käyttöön');
+      }
+    })
+    .catch((error) => {
+      console.error('ERROR asking authorization: ' + error);
+    })
   }
 
   /*
@@ -102,14 +154,16 @@ export class MapComponent {
         zoomControl: false,
         maxZoom: 18
       })
-      .locate({watch: true})
+      .setView([64, 26], 5) //initial view, if location found, sets view to location
+      .locate({watch: true, enableHighAccuracy:false, maximumAge:30000})
       .whenReady(this.dismissLoading.bind(this))
       .on('click', this.onMapClick.bind(this))
       .on('contextmenu', this.selectLocation.bind(this))
       // .on('dblclick', this.selectLocation.bind(this))
       // .on('click', this.clearSelection.bind(this))
       .on('locationfound', this.onLocationFound.bind(this))
-      .on('locationerror', this.onLocationError.bind(this));
+      .on('locationerror', this.onLocationError.bind(this))
+      .on('tileerror', this.onTileError.bind(this));
 
     // TANGRAM
     // Tangram
@@ -203,16 +257,27 @@ export class MapComponent {
     .addTo(this.map);
   }
 
+  //Set the view to Finland only if no location ha
   onLocationError(e) {
-    // this.map.setView([64, 26], 5);
     this.toast.showFail('Virhe sijaintitiedossa');
     console.log('ERROR LOCATION:')
-    console.log(e);
+    console.log('location errorcode: ' + e.code);
+    console.log('location errormessage: ' + e.message);
+  }
+
+  onTileError(e) {
+    this.toast.showFail('Virhe kartan latauksessa');
+    console.log(e)
+    console.log(e.error)
   }
 
   goToCurrentLocation () {
-    this.map.setView(this.location, this.autozoom);
-    this.clearSelection();
+    if(this.location) {
+      this.map.setView(this.location, this.autozoom);
+      this.clearSelection();
+    } else {
+      this.toast.showFail('Virhe sijaintitiedon haussa');
+    }
     // let e = {latlng: this.location}
     // console.log(e);
     // this.selectLocation(e);

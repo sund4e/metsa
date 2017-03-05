@@ -41,21 +41,35 @@ Geolocation not working on android: Add these to AndroidManifes.xml:
 ##Typings issue
 Make sure that ´tsconfig.json´has
 
-´´´
+```
 "include": [
   "typings/index.d.ts"
 ]
-´´´
+```
 
 ##others
 Lodash typings 4.14.52 are invalid: manually install the pervious verion
 
-´´´
+```
 typings remove
 npm install @types/lodash@4.14.44 --save
-´´´
+```
 
+##Production build -- Android
+```
+ionic build android --prod --release
+```
 
+Before adding to play store you need to sign the APK and zipalign it
+```
+cd platforms/android/build/outputs/apk/
+
+keytool -genkey -v -keystore my-release-key.keystore -alias APPIN_NIMI -keyalg RSA -keysize 2048 -validity 10000
+
+jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore android-release-unsigned.apk APPIN_NIMI
+
+~/Library/Android/sdk/build-tools/25.0.2/zipalign -v 4 android-release-unsigned.apk Apaja.apk
+```
 ## Tests
 
 Describe and show how to run the tests with code examples.

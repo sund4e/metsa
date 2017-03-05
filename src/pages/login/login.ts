@@ -62,11 +62,15 @@ export class LoginPage {
       .then( authData => {
         this.nav.setRoot(MapPage);
       }, (error: any) => {
+        console.log('LOGIN ERROR: error.code: ' + error.code
+          + ', error.message: ' + error.message);
         this.loading.dismiss().then(() => {
           if (error.code == 'auth/user-not-found') {
             this.toast.showFail('Sähköpostiosoitetta vastaavaa tiliä ei löydy');
           } else if (error.code == 'auth/wrong-password') {
             this.toast.showFail('Väärä salasana');
+          } else if (error.code == 'auth/network-request-failed') {
+            this.toast.showFail('Verkkoyhteys ei ole käytettävissä');
           } else {
             this.toast.showFail('Virhe kirjautumisessa: ' + error.message);
           }

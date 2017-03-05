@@ -53,50 +53,6 @@ export class MapPage {
     this.itemSubscription = this.itemListObservable.subscribe((list) => {
       this.itemList = list;
     });
-
-    // let locationSuccess = (position) => {
-    //   console.log('Location found!!');
-    //   console.log(position);
-    //   this.itemListObservable = this.itemService.getSortedItems(
-    //     position.coords.latitude, position.coords.longitude
-    //   )
-    //   this.itemSubscription = this.itemListObservable.subscribe((list) => {
-    //     this.itemList = list;
-    //   });
-    // }
-    //
-    // let locationError = (error) => {
-    //   console.log('Location not found :(');
-    //   console.log(error.message);
-    //   if(error.TIMEOUT) {
-    //     this.toast.showFail('Sijaintietoa ei löytynyt');
-    //   } else if (error.POSITION_UNAVAILABLE) {
-    //     this.toast.showFail('Satelliittipaikannukseen ei saatu yhteyttä')
-    //   } else if(error.PERMISSION_DENIED) {
-    //     this.toast.showFail(
-    //       'Ei käyttöoikeutta sijaintitietoihin, takista puhelimen asetukset'
-    //     )
-    //   } else {
-    //     this.toast.showFail(error.message)
-    //   }
-    //   this.itemListObservable = this.itemService.getItems();
-    //   this.itemSubscription = this.itemListObservable.subscribe((list) => {
-    //     this.itemList = list;
-    //   });
-    // }
-    //
-    // /*
-    // Needs timeout as otherwise the locationError callback will not be fired
-    // MaxAge acceps a cached position no older than speciefied
-    // https://github.com/apache/cordova-plugin-geolocation
-    // */
-    // navigator.geolocation.watchPosition(
-    //   locationSuccess, locationError, {
-    //     enableHighAccuracy: true,
-    //     maximumAge: 5000,
-    //     timeout: 10000
-    //   }
-    // );
   }
 
   /*
